@@ -8,11 +8,11 @@ var running = false;
 var X_STEP = 2;
 var Y_STEP = 2;
 
-var shape = new Array();
+var shapes = new Array();
 
-function initSvg(){
-	
-}
+(function initSvg(){
+	console.log('Client Application initialization started...');
+})();
 
 function getMaxX(){
 	return getMaxDimensions()[0];
@@ -28,7 +28,6 @@ function getMaxDimensions()
 	var dimensions = new Object();
 	dimensions[0] = parseInt( svgCanvas.getAttribute('width'), 10 );
 	dimensions[1] = parseInt( svgCanvas.getAttribute('height'), 10 );
-	console.log(dimensions);
 	return dimensions;
 }
 
@@ -42,6 +41,10 @@ function start(){
 
 function stop(){
 	running = false;
+}
+
+function getSvgCanvas(){
+	return document.getElementById('svgCanvas');
 }
 
 function getTestShape(){
@@ -86,9 +89,25 @@ function moveYStep(stepLength){
 	this.setAttribute("cy", nextY);
 }
 
-
-
-function onSvgMouseMove() 
+function addCircle(circleId, centerX, centerY, radius, color)
 {
-	
+	var element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+	element.setAttribute('id', circleId);
+	element.setAttribute('cx', centerX);
+	element.setAttribute('cy', centerY);
+	element.setAttribute('r', radius);
+	element.setAttribute('fill', color);
+	getSvgCanvas().appendChild(element)
+	shapes.push(element);
+	console.log(element);
+	return element;
+}
+
+function onSvgMouseMove(mouseEvent) {
+	console.log(mouseEvent);
+	addCircle('circle_' + nextId(), mouseEvent.offsetX, mouseEvent.offsetY, 10, 'green');
+}
+
+function nextId(){
+	return shapes.length + 1;
 }
