@@ -10,7 +10,12 @@ var MAX_Y = 500
 var X_STEP = 2;
 var Y_STEP = 2;
 
+var shape = new Array();
+
 function start(){
+	if(running){
+		return;
+	}
 	running = true;
 	animateFrame();
 }
