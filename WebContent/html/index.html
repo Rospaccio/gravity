@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
+	<meta charset="ISO-8859-1">
+	<title>Insert title here</title>
+	<script type="text/javascript" src="../script/svg-app.js"></script>
 </head>
-	<body style="background-color: cyan;">
-		<h1>TEST</h1>
-		<h2>Thi is a stupid subtitle</h2>
+	<body>
+		<h1>SVG Demo</h1>
+		<div style="border-style: solid; border-width: 1px;">
+			<svg id="svgCanvas" width="1000" height="500">
+				<circle id="testShape" cx="20" cy="20" r="10" fill="blak"></circle>
+			</svg>
+		</div>
+		
+		<input type="button" id="startButton" name="startButton" value="START" onclick="start();"/>
+		<input type="button" id="stopButton value="stop" value="STOP" onclick="stop();"/> 
+		
 	</body>
 </html>
