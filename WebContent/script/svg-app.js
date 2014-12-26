@@ -8,6 +8,16 @@ var running = false;
 var X_STEP = 2;
 var Y_STEP = 2;
 
+var VX_DEFAULT = 1;
+var VY_DEFAULT = VX_DEFAULT;
+
+var STEP_INTERVAL = 1; // / 25; /* 25 frames per second */
+
+/*
+ * s = v * t;
+ * v expressed in m/s
+ */
+
 var shapes = new Array();
 
 (function initSvg(){
@@ -36,7 +46,8 @@ function start(){
 		return;
 	}
 	running = true;
-	animateFrame();
+	// animateFrame();
+	gameLoop();
 }
 
 function stop(){
@@ -77,6 +88,45 @@ function animateFrame(){
 	}
 }
 
+function gameLoop()
+{
+	$(shapes).each(
+			function()
+			{
+				animateShapeFrame(this);
+			}
+		);
+	
+	if(running){
+		setTimeout(gameLoop, STEP_INTERVAL);
+	}
+}
+
+function animateShapeFrame(svgShape){
+	var currentX = parseInt(svgShape.getAttribute("cx"), 10);
+	var currentY = parseInt(svgShape.getAttribute("cy"), 10);
+	if(isNaN(currentY))
+	{
+		console.log("currentY == NaN. attribute = " + svgShape.getAttribute("cy"));
+		stop();
+	}
+	var radius = parseInt( svgShape.getAttribute("r"), 10 );
+	
+	if(currentX >= getMaxX() - radius || currentX <= 0 + radius){
+		svgShape.vx = -1 * svgShape.vx;
+	}
+	
+	if(currentY + radius >= getMaxY() || currentY - radius <= 0){
+		svgShape.vy = -1 * svgShape.vy;
+	}
+	
+	xStep = svgShape.vx * STEP_INTERVAL;
+	yStep = svgShape.vy * STEP_INTERVAL;
+	
+	svgShape.moveXStep(xStep);
+	svgShape.moveYStep(yStep);
+}
+
 function moveXStep(stepLength){
 	var currentX = parseInt(this.getAttribute("cx"));
 	var nextX = currentX + stepLength;
@@ -89,6 +139,14 @@ function moveYStep(stepLength){
 	this.setAttribute("cy", nextY);
 }
 
+function wrapShape(svgShape)
+{
+	svgShape.moveXStep = moveXStep;
+	svgShape.moveYStep = moveYStep;
+	svgShape.vx = VX_DEFAULT;
+	svgShape.vy = VY_DEFAULT;
+}
+
 function addCircle(circleId, centerX, centerY, radius, color)
 {
 	var element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
@@ -97,9 +155,10 @@ function addCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('cy', centerY);
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
+	wrapShape(element);
 	getSvgCanvas().appendChild(element)
 	shapes.push(element);
-	console.log(element);
+	console.log(shapes);
 	return element;
 }
 
