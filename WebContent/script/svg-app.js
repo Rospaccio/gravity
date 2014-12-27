@@ -126,6 +126,19 @@ function wrapShape(svgShape)
 
 function addCircle(circleId, centerX, centerY, radius, color)
 {
+	if(centerX < 0 + radius){
+		centerX = radius + 1;
+	}
+	if(centerX > getMaxX() - radius){
+		centerX = getMaxX() - radius;
+	}
+	if(centerY < 0 + radius){
+		centerY = radius + 1;
+	}
+	if(centerY > getMaxY() - radius){
+		centerY = getMaxY() - radius;
+	}
+	
 	var element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 	element.setAttribute('id', circleId);
 	element.setAttribute('cx', centerX);
