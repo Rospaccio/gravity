@@ -126,13 +126,13 @@ function wrapShape(svgShape)
 
 function addCircle(circleId, centerX, centerY, radius, color)
 {
-	if(centerX < 0 + radius){
+	if(centerX <= 0 + radius){
 		centerX = radius + 1;
 	}
 	if(centerX > getMaxX() - radius){
 		centerX = getMaxX() - radius;
 	}
-	if(centerY < 0 + radius){
+	if(centerY <= 0 + radius){
 		centerY = radius + 1;
 	}
 	if(centerY > getMaxY() - radius){
