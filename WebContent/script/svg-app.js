@@ -65,29 +65,6 @@ function getTestShape(){
 	return svgShape;
 }
 
-function animateFrame(){
-	
-	svgShape = getTestShape();
-	var currentX = parseInt(svgShape.getAttribute("cx"), 10);
-	var currentY = parseInt(svgShape.getAttribute("cy"), 10);
-	var radius = 10; // parseInt(svgShape.getAttribute("r"), 10);
-	
-	if(currentX >= getMaxX() - radius || currentX <= 0 + radius){
-		X_STEP = -1 * X_STEP;
-	}
-	
-	if(currentY + radius >= getMaxY() || currentY - radius <= 0){
-		Y_STEP = -1 * Y_STEP;
-	}
-	
-	svgShape.moveXStep(X_STEP);
-	svgShape.moveYStep(Y_STEP);
-	
-	if(running){
-		setTimeout(animateFrame, 2.4);
-	}
-}
-
 function gameLoop()
 {
 	$(shapes).each(
@@ -162,11 +139,20 @@ function addCircle(circleId, centerX, centerY, radius, color)
 	return element;
 }
 
-function onSvgMouseMove(mouseEvent) {
+function onSvgMouseDown(mouseEvent) {
+	mouseEvent = mouseEvent || window.event;
 	console.log(mouseEvent);
-	addCircle('circle_' + nextId(), mouseEvent.offsetX, mouseEvent.offsetY, 10, 'green');
+	
+	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
+	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+	
+	addCircle('circle_' + nextId(), x, y, 10, 'green');
 }
 
 function nextId(){
 	return shapes.length + 1;
+}
+
+function calculateOffsetX(){
+	
 }

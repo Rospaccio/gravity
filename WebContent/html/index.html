@@ -8,17 +8,18 @@
 	<script type="text/javascript" src="../test-script/test-app.js"></script>
 	<script type="text/javascript">
 	
-// 		$(document).ready(initSvg);
+// 		$(document).ready(initSvg());
 
 	</script>
 </head>
 	<body>
 		<h1>SVG Demo</h1>
-		
+		<p>
+			Click inside the rectangle to add circles. Click "START" to activate the movement, "STOP"" to deactivate.
+		</p>
 		<div style="float: left;">
 			<div>
-				<svg id="svgCanvas" width="800" height="500" style="border-style: solid; border-width: 1px;"
-					onmousedown="onSvgMouseMove(event);">
+				<svg id="svgCanvas" width="800" height="500" style="border-style: solid; border-width: 1px;">
 
 				</svg>
 			</div>
@@ -27,15 +28,18 @@
 				<input type="button" id="stopButton value="stop" value="STOP" onclick="stop();"/> 
 			</div>
 			<div>
-				<select>
-					<option  value="circle">circle</option>
-					<option value="rectangle">rectangle</option>
-					<option value="line">line</option>
-				</select>
+<!-- 				<select> -->
+<!-- 					<option  value="circle">circle</option> -->
+<!-- 					<option value="rectangle">rectangle</option> -->
+<!-- 					<option value="line">line</option> -->
+<!-- 				</select> -->
 			</div>
 		</div>
 		<div style="clear: both;">
 			
 		</div>
 	</body>
+	<script type="text/javascript">
+		getSvgCanvas().onmousedown = function(e){ onSvgMouseDown(e); };
+	</script>
 </html>
