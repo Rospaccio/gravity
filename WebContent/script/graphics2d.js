@@ -49,7 +49,7 @@ function activateDrawing(event){
 	getCanvas().onmousemove = function(moveEvent){ onCanvasMouseMove(new MultiBrowserMouseEvent(moveEvent)) };
 }
 
-function deactivateDrawing(){
+function deactivateDrawing(event){
 	console.log('mouse up');
 	console.log(event);
 //	document.onmouseup = function() {};
