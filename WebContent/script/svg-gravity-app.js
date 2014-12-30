@@ -8,10 +8,6 @@ var running = false;
 var X_STEP = 2;
 var Y_STEP = 2;
 
-var VX_DEFAULT = 1;
-var VY_DEFAULT = VX_DEFAULT;
-
-var STEP_INTERVAL = 1; // / 25; /* 25 frames per second */
 
 /*
  * s = v * t;
@@ -67,6 +63,15 @@ function getTestShape(){
 
 function gameLoop()
 {
+	/* checks for shapes to remove */
+	for(i = 0; i < shapes.length; i++){
+		if(shapes[i].toBeRemoved){
+			getSvgCanvas().removeChild(shapes[i]);
+			shapes.splice(i, 1);
+		}
+	}
+	/* end check*/
+	
 	$(shapes).each(
 			function()
 			{
@@ -79,14 +84,26 @@ function gameLoop()
 	}
 }
 
-function animateShapeFrame(svgShape){
-	for (i = 0; i < shapes.length; i++){
-		if(shapes[i].id == svgShape.id){
-			continue;
-		}
-		
-		svgShape.updatePosition(shapes[i]);		
+function animateShapeFrame(svgShape) {
+	if(svgShape.toBeRemoved){
+		return;
 	}
+	for (i = 0; i < shapes.length; i++) {
+		if (shapes[i].id != svgShape.id) {
+			if (svgShape.overlaps(shapes[i])) {
+				svgShape.mass += shapes[i].mass;
+//				svgShape.vx += shapes[i].vx;
+//				svgShape.vy += shapes[i].vy;
+				/* marks the overlapping shape for removal */
+				shapes[i].toBeRemoved = true;
+				continue;
+			}
+			
+			svgShape.addForce(shapes[i]);
+		}
+	}
+
+	svgShape.updatePosition();
 }
 
 function moveXStep(stepLength){

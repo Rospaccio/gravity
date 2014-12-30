@@ -38,3 +38,10 @@ function testGetX(){
 	wrapWithMassProperty(circle, EARTH_MASS);
 	console.log(circle.getX());
 }
+
+function testOverlap(){
+	var backCircle = addCircle("c01", 400, 250, 30, 'blue');
+	var frontCircle = addCircle("c01", 459, 250, 30, 'blue');
+	
+	console.log("overlap? => " + backCircle.overlaps(frontCircle));
+}

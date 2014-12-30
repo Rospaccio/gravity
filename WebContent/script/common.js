@@ -11,7 +11,10 @@ var EARTH_MOON_SCREEN_DISTANCE = 350;
 
 var DISTANCE_SCALE_FACTOR = EARTH_MOON_DISTANCE / EARTH_MOON_SCREEN_DISTANCE;
 
-var STEP_INTERVAL = 0.041; // in seconds
+var STEP_INTERVAL = 0.41; // 0.041 for 24 frames per seconds
+
+var VX_DEFAULT = 0;
+var VY_DEFAULT = 0;
 
 function MultiBrowserMouseEvent(innerEvent){
 	this.innerEvent = innerEvent;
@@ -27,9 +30,15 @@ function MultiBrowserMouseEvent(innerEvent){
 
 function wrapWithMassProperty(svgElement, mass)
 {
+	svgElement.toBeRemoved = false;
+	
 	svgElement.mass = mass;
-	svgElement.vx = 0;
-	svgElement.vy = 0;
+	
+	svgElement.ax = 0;
+	svgElement.ay = 0;
+	
+	svgElement.vx = VX_DEFAULT;
+	svgElement.vy = VY_DEFAULT;
 	
 	svgElement.getX = function(){
 		return parseFloat(this.getAttribute('cx'));
@@ -38,6 +47,10 @@ function wrapWithMassProperty(svgElement, mass)
 	svgElement.getY = function(){
 		return parseFloat(this.getAttribute('cy'));
 	};
+	
+	svgElement.getRadius = function(){
+		return parseFloat(this.getAttribute('r'));
+	}
 	
 	svgElement.forceBetween = function(massiveObject)
 	{
@@ -56,7 +69,7 @@ function wrapWithMassProperty(svgElement, mass)
 		return squareDistance;
 	};
 	
-	svgElement.updatePosition = function(massiveObject){
+	svgElement.addForce = function(massiveObject){
 		var forceMagnitude = this.forceBetween(massiveObject);
 		var squareDistance = this.squareDistanceFrom(massiveObject);
 		var distance = Math.sqrt(squareDistance);
@@ -70,22 +83,32 @@ function wrapWithMassProperty(svgElement, mass)
 		var fx = forceMagnitude * xRatio;
 		var fy = forceMagnitude * yRatio;
 		
-		var ax = fx / this.mass;
-		var ay = fy / this.mass;
+		this.ax += fx / this.mass;
+		this.ay += fy / this.mass;
+	}
+	
+	svgElement.updatePosition = function(){
 		
-		this.vx += ax * STEP_INTERVAL;
-		this.vy += ay * STEP_INTERVAL;
+		this.vx += this.ax * STEP_INTERVAL;
+		this.vy += this.ay * STEP_INTERVAL;
 		
-		var nextX = this.getX() + 1/2 * ax * STEP_INTERVAL;
-		var nextY = this.getY() + 1/2 * ay * STEP_INTERVAL;
+		var nextX = this.getX() + (this.vx * STEP_INTERVAL) + (1/2 * this.ax * STEP_INTERVAL);
+		var nextY = this.getY() + (this.vy * STEP_INTERVAL) + (1/2 * this.ay * STEP_INTERVAL);
 		
-		console.log("new position: (" + nextX + ", " + nextY + ")");
+//		var nextX = this.getX() + (1/2 * this.ax * STEP_INTERVAL);
+//		var nextY = this.getY() + (1/2 * this.ay * STEP_INTERVAL);
+		
+//		console.log("new position: (" + nextX + ", " + nextY + ")");
 		
 		this.setAttribute('cx', nextX);
 		this.setAttribute('cy', nextY);
+		
+		this.ax = 0;
+		this.ay = 0;
 	};
 	
-	svgElement.moveStep = function(timeInterval){
-		
+	svgElement.overlaps = function(massiveObject){
+		var squareDistance = this.squareDistanceFrom(massiveObject);
+		return squareDistance <= Math.pow(this.getRadius() * DISTANCE_SCALE_FACTOR + massiveObject.getRadius() * DISTANCE_SCALE_FACTOR, 2);
 	};
 }
