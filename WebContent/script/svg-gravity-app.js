@@ -50,6 +50,15 @@ function stop(){
 	running = false;
 }
 
+function reset(){
+	$(shapes).each(
+			function(){
+				getSvgCanvas().removeChild(this);
+			}
+		);
+	shapes = new Array();
+}
+
 function getSvgCanvas(){
 	return document.getElementById('svgCanvas');
 }
