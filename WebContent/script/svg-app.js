@@ -13,6 +13,8 @@ var VY_DEFAULT = VX_DEFAULT;
 
 var STEP_INTERVAL = 1; // / 25; /* 25 frames per second */
 
+var lastVectorLine;
+
 /*
  * s = v * t;
  * v expressed in m/s
@@ -126,6 +128,14 @@ function wrapShape(svgShape)
 
 function addCircle(circleId, centerX, centerY, radius, color)
 {
+	var circle = createCircle(circleId, centerX, centerY, radius, color);
+	
+	shapes.push(circle);
+	return element;
+}
+
+function createCircle(circleId, centerX, centerY, radius, color){
+
 	if(centerX <= 0 + radius){
 		centerX = radius + 1;
 	}
@@ -147,19 +157,53 @@ function addCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('fill', color);
 	wrapShape(element);
 	getSvgCanvas().appendChild(element)
-	shapes.push(element);
-	console.log(shapes);
 	return element;
 }
 
 function onSvgMouseDown(mouseEvent) {
-	mouseEvent = mouseEvent || window.event;
-	console.log(mouseEvent);
 	
-	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
-	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+	var x = mouseEvent.getX();
+	var y = mouseEvent.getY();
 	
-	addCircle('circle_' + nextId(), x, y, 10, 'green');
+	var circle = createCircle('circle_' + nextId(), x, y, 10, 'green');
+	
+	getSvgCanvas().onmousemove = function(event){ drawSpeedVector(new MultiBrowserMouseEvent(event)) };
+	
+	// creates a line
+	lastVectorLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+	lastVectorLine.setAttribute('x1', mouseEvent.getX());
+	lastVectorLine.setAttribute('y1', mouseEvent.getY());
+	lastVectorLine.setAttribute('x2', mouseEvent.getX());
+	lastVectorLine.setAttribute('y2', mouseEvent.getY());
+	lastVectorLine.setAttribute('style', "stroke:rgb(255,0,0);stroke-width:1");
+	getSvgCanvas().appendChild(lastVectorLine);
+	//
+	
+	getSvgCanvas().onmouseup = function(event){ onMouseUpAdd(circle) };
+}
+
+function drawSpeedVector(mouseEvent){
+	lastVectorLine.setAttribute('x2', mouseEvent.getX());
+	lastVectorLine.setAttribute('y2', mouseEvent.getY());
+}
+
+function onMouseUpAdd(circle){
+	shapes.push(circle);
+	getSvgCanvas().removeChild(lastVectorLine);
+	getSvgCanvas().onmousemove = function(e){};
+	console.log('END')
+}
+
+function MultiBrowserMouseEvent(innerEvent){
+	this.innerEvent = innerEvent;
+	
+	this.getX = function(){
+		return this.innerEvent.offsetX ? this.innerEvent.offsetX : this.innerEvent.clientX - mainCanvas.getBoundingClientRect().left;
+	};
+	
+	this.getY = function(){
+		return this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - mainCanvas.getBoundingClientRect().top;
+	};
 }
 
 function nextId(){
