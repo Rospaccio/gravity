@@ -48,6 +48,6 @@
 		</div>
 	</body>
 	<script type="text/javascript">
-		getSvgCanvas().onmousedown = function(e){ onSvgMouseDown(e); };
+		getSvgCanvas().onmousedown = function(e){ onSvgMouseDown(new MultiBrowserMouseEvent(e)); };
 	</script>
 </html>
