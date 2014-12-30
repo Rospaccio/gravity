@@ -80,28 +80,13 @@ function gameLoop()
 }
 
 function animateShapeFrame(svgShape){
-	var currentX = parseInt(svgShape.getAttribute("cx"), 10);
-	var currentY = parseInt(svgShape.getAttribute("cy"), 10);
-	if(isNaN(currentY))
-	{
-		console.log("currentY == NaN. attribute = " + svgShape.getAttribute("cy"));
-		stop();
+	for (i = 0; i < shapes.length; i++){
+		if(shapes[i].id == svgShape.id){
+			continue;
+		}
+		
+		svgShape.updatePosition(shapes[i]);		
 	}
-	var radius = parseInt( svgShape.getAttribute("r"), 10 );
-	
-	if(currentX >= getMaxX() - radius || currentX <= 0 + radius){
-		svgShape.vx = -1 * svgShape.vx;
-	}
-	
-	if(currentY + radius >= getMaxY() || currentY - radius <= 0){
-		svgShape.vy = -1 * svgShape.vy;
-	}
-	
-	xStep = svgShape.vx * STEP_INTERVAL;
-	yStep = svgShape.vy * STEP_INTERVAL;
-	
-	svgShape.moveXStep(xStep);
-	svgShape.moveYStep(yStep);
 }
 
 function moveXStep(stepLength){
@@ -116,13 +101,13 @@ function moveYStep(stepLength){
 	this.setAttribute("cy", nextY);
 }
 
-function wrapShape(svgShape)
-{
-	svgShape.moveXStep = moveXStep;
-	svgShape.moveYStep = moveYStep;
-	svgShape.vx = VX_DEFAULT;
-	svgShape.vy = VY_DEFAULT;
-}
+//function wrapShape(svgShape)
+//{
+//	svgShape.moveXStep = moveXStep;
+//	svgShape.moveYStep = moveYStep;
+//	svgShape.vx = VX_DEFAULT;
+//	svgShape.vy = VY_DEFAULT;
+//}
 
 function addCircle(circleId, centerX, centerY, radius, color)
 {
@@ -145,10 +130,10 @@ function addCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('cy', centerY);
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
-	wrapShape(element);
+	wrapWithMassProperty(element, EARTH_MASS);
 	getSvgCanvas().appendChild(element)
 	shapes.push(element);
-	console.log(shapes);
+//	console.log(shapes);
 	return element;
 }
 
@@ -159,7 +144,7 @@ function onSvgMouseDown(mouseEvent) {
 	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
 	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
 	
-	addCircle('circle_' + nextId(), x, y, 10, 'green');
+	addCircle('circle_' + nextId(), x, y, 10, 'grey');
 }
 
 function nextId(){
