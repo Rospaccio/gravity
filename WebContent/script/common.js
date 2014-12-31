@@ -16,6 +16,8 @@ var STEP_INTERVAL = 0.41; // 0.041 for 24 frames per seconds
 var VX_DEFAULT = 0;
 var VY_DEFAULT = 0;
 
+var traceCounter = 0;
+
 function MultiBrowserMouseEvent(innerEvent){
 	this.innerEvent = innerEvent;
 	
@@ -39,6 +41,8 @@ function wrapWithMassProperty(svgElement, mass)
 	
 	svgElement.vx = VX_DEFAULT;
 	svgElement.vy = VY_DEFAULT;
+	
+	svgElement.traceCounter = 0;
 	
 	svgElement.getX = function(){
 		return parseFloat(this.getAttribute('cx'));
@@ -105,6 +109,13 @@ function wrapWithMassProperty(svgElement, mass)
 		
 		this.ax = 0;
 		this.ay = 0;
+	};
+	
+	svgElement.drawTrace = function(){
+		if(++this.traceCounter % 10 == 0){
+			var traceElement = createCircle("trace", this.getX(), this.getY(), 1, 'black');
+			traceElement.setAttribute('name', 'trace');
+		}
 	};
 	
 	svgElement.overlaps = function(massiveObject){

@@ -13,6 +13,8 @@ var SPEED_SCALE_FACTOR = 1 / 200;
 var selectedMass = MOON_MASS;
 var selectedColor = 'grey';
 
+var tracesActive = false;
+
 /*
  * s = v * t;
  * v expressed in m/s
@@ -94,6 +96,9 @@ function gameLoop()
 	$(shapes).each(
 			function(){
 				this.updatePosition();
+				if(tracesActive){
+					this.drawTrace();
+				}
 			}
 	);
 	
@@ -237,6 +242,10 @@ function setMoonMode(){
 function setEarthMode(){
 	selectedColor = 'blue';
 	selectedMass = EARTH_MASS;
+}
+
+function toggleTraces(){
+	tracesActive = !tracesActive;
 }
 
 function nextId(){

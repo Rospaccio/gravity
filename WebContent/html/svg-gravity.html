@@ -45,6 +45,8 @@
 			<input type="button" id="startButton" name="startButton" value="START" onclick="start();"/>
 			<input type="button" id="stopButton" name="stopButton" value="STOP" onclick="stop();"/> 
 			<input type="button" id="resetButton" value="RESET" onclick="reset();" />
+			<input type="button" id="traceButton" value="TRACES" onclick="toggleTraces();"/>
+			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="$('[name=\'trace\']').each( function() { getSvgCanvas().removeChild(this); } )"/>
 		</div>
 	</body>
 	<script type="text/javascript">
