@@ -88,12 +88,12 @@ function wrapWithMassProperty(svgElement, mass)
 	}
 	
 	svgElement.updatePosition = function(){
-		
+
 		this.vx += this.ax * STEP_INTERVAL;
 		this.vy += this.ay * STEP_INTERVAL;
 		
-		var nextX = this.getX() + (this.vx * STEP_INTERVAL) + (1/2 * this.ax * STEP_INTERVAL);
-		var nextY = this.getY() + (this.vy * STEP_INTERVAL) + (1/2 * this.ay * STEP_INTERVAL);
+		var nextX = this.getX() + (this.vx * STEP_INTERVAL) + (1/2 * this.ax * STEP_INTERVAL * STEP_INTERVAL);
+		var nextY = this.getY() + (this.vy * STEP_INTERVAL) + (1/2 * this.ay * STEP_INTERVAL * STEP_INTERVAL);
 		
 //		var nextX = this.getX() + (1/2 * this.ax * STEP_INTERVAL);
 //		var nextY = this.getY() + (1/2 * this.ay * STEP_INTERVAL);

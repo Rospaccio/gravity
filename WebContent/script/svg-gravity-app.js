@@ -9,6 +9,10 @@ var X_STEP = 2;
 var Y_STEP = 2;
 
 var SPEED_SCALE_FACTOR = 1 / 200;
+
+var selectedMass = MOON_MASS;
+var selectedColor = 'grey';
+
 /*
  * s = v * t;
  * v expressed in m/s
@@ -87,6 +91,11 @@ function gameLoop()
 				animateShapeFrame(this);
 			}
 		);
+	$(shapes).each(
+			function(){
+				this.updatePosition();
+			}
+	);
 	
 	if(running){
 		setTimeout(gameLoop, STEP_INTERVAL);
@@ -111,8 +120,6 @@ function animateShapeFrame(svgShape) {
 			svgShape.addForce(shapes[i]);
 		}
 	}
-
-	svgShape.updatePosition();
 }
 
 function moveXStep(stepLength){
@@ -156,7 +163,7 @@ function createCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('cy', centerY);
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
-	wrapWithMassProperty(element, EARTH_MASS);
+	wrapWithMassProperty(element, selectedMass);
 	getSvgCanvas().appendChild(element)
 //	console.log(shapes);
 	return element;
@@ -183,7 +190,7 @@ function onSvgMouseDown(mouseEvent) {
 	var x = mouseEvent.getX();
 	var y = mouseEvent.getY();
 	
-	var circle = createCircle('circle_' + nextId(), x, y, 10, 'grey');
+	var circle = createCircle('circle_' + nextId(), x, y, 10, selectedColor);
 	
 	getSvgCanvas().onmousemove = function(event){ drawSpeedVector(new MultiBrowserMouseEvent(event)) };
 	
@@ -222,6 +229,15 @@ function onMouseUpAdd(circle){
 	console.log('END')
 }
 
+function setMoonMode(){
+	selectedColor = 'grey';
+	selectedMass = MOON_MASS;
+}
+
+function setEarthMode(){
+	selectedColor = 'blue';
+	selectedMass = EARTH_MASS;
+}
 
 function nextId(){
 	return shapes.length + 1;
