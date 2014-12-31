@@ -128,14 +128,12 @@ function wrapShape(svgShape)
 
 function addCircle(circleId, centerX, centerY, radius, color)
 {
-	var circle = createCircle(circleId, centerX, centerY, radius, color);
-	
-	shapes.push(circle);
+	var element = createCircle(circleId, centerX, centerY, radius, color);
+	shapes.push(element);
 	return element;
 }
 
 function createCircle(circleId, centerX, centerY, radius, color){
-
 	if(centerX <= 0 + radius){
 		centerX = radius + 1;
 	}
@@ -205,6 +203,8 @@ function MultiBrowserMouseEvent(innerEvent){
 		return this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - mainCanvas.getBoundingClientRect().top;
 	};
 }
+
+
 
 function nextId(){
 	return shapes.length + 1;

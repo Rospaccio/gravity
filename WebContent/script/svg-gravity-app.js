@@ -8,6 +8,10 @@ var running = false;
 var X_STEP = 2;
 var Y_STEP = 2;
 
+var SPEED_SCALE_FACTOR = 1 / 200;
+
+var selectedMass = MOON_MASS;
+var selectedColor = 'grey';
 
 /*
  * s = v * t;
@@ -87,6 +91,11 @@ function gameLoop()
 				animateShapeFrame(this);
 			}
 		);
+	$(shapes).each(
+			function(){
+				this.updatePosition();
+			}
+	);
 	
 	if(running){
 		setTimeout(gameLoop, STEP_INTERVAL);
@@ -111,8 +120,6 @@ function animateShapeFrame(svgShape) {
 			svgShape.addForce(shapes[i]);
 		}
 	}
-
-	svgShape.updatePosition();
 }
 
 function moveXStep(stepLength){
@@ -135,7 +142,7 @@ function moveYStep(stepLength){
 //	svgShape.vy = VY_DEFAULT;
 //}
 
-function addCircle(circleId, centerX, centerY, radius, color)
+function createCircle(circleId, centerX, centerY, radius, color)
 {
 	if(centerX <= 0 + radius){
 		centerX = radius + 1;
@@ -156,21 +163,80 @@ function addCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('cy', centerY);
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
-	wrapWithMassProperty(element, EARTH_MASS);
+	wrapWithMassProperty(element, selectedMass);
 	getSvgCanvas().appendChild(element)
-	shapes.push(element);
 //	console.log(shapes);
 	return element;
 }
 
+function addCircle(circleId, centerX, centerY, radius, color){
+	var element = createCircle(circleId, centerX, centerY, radius, color);
+	shapes.push(element);
+	return element;
+}
+
+//function onSvgMouseDown(mouseEvent) {
+//	mouseEvent = mouseEvent || window.event;
+//	console.log(mouseEvent);
+//	
+//	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
+//	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+//	
+//	addCircle('circle_' + nextId(), x, y, 10, 'grey');
+//}
+
 function onSvgMouseDown(mouseEvent) {
-	mouseEvent = mouseEvent || window.event;
-	console.log(mouseEvent);
 	
-	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
-	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+	var x = mouseEvent.getX();
+	var y = mouseEvent.getY();
 	
-	addCircle('circle_' + nextId(), x, y, 10, 'grey');
+	var circle = createCircle('circle_' + nextId(), x, y, 10, selectedColor);
+	
+	getSvgCanvas().onmousemove = function(event){ drawSpeedVector(new MultiBrowserMouseEvent(event)) };
+	
+	// creates a line
+	lastVectorLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+	lastVectorLine.setAttribute('x1', mouseEvent.getX());
+	lastVectorLine.setAttribute('y1', mouseEvent.getY());
+	lastVectorLine.setAttribute('x2', mouseEvent.getX());
+	lastVectorLine.setAttribute('y2', mouseEvent.getY());
+	lastVectorLine.setAttribute('style', "stroke:rgb(255,0,0);stroke-width:1");
+	getSvgCanvas().appendChild(lastVectorLine);
+	//
+	
+	getSvgCanvas().onmouseup = function(event){ onMouseUpAdd(circle) };
+}
+
+function drawSpeedVector(mouseEvent){
+	lastVectorLine.setAttribute('x2', mouseEvent.getX());
+	lastVectorLine.setAttribute('y2', mouseEvent.getY());
+}
+
+function onMouseUpAdd(circle){
+	
+	// gets the length of the graphic vector and computer the corresponding speed:
+	
+	var graphicXDiff = parseFloat(lastVectorLine.getAttribute("x2")) - parseFloat(lastVectorLine.getAttribute("x1"));
+	var graphicYDiff = parseFloat(lastVectorLine.getAttribute("y2")) - parseFloat(lastVectorLine.getAttribute("y1"));
+	
+	// the speed components are proportional to the graphic components
+	circle.vx = graphicXDiff * SPEED_SCALE_FACTOR;
+	circle.vy = graphicYDiff * SPEED_SCALE_FACTOR;
+	
+	shapes.push(circle);
+	getSvgCanvas().removeChild(lastVectorLine);
+	getSvgCanvas().onmousemove = function(e){};
+	console.log('END')
+}
+
+function setMoonMode(){
+	selectedColor = 'grey';
+	selectedMass = MOON_MASS;
+}
+
+function setEarthMode(){
+	selectedColor = 'blue';
+	selectedMass = EARTH_MASS;
 }
 
 function nextId(){
