@@ -22,11 +22,11 @@ function MultiBrowserMouseEvent(innerEvent){
 	this.innerEvent = innerEvent;
 	
 	this.getX = function(){
-		return this.innerEvent.offsetX ? this.innerEvent.offsetX : this.innerEvent.clientX - mainCanvas.getBoundingClientRect().left;
+		return this.innerEvent.offsetX ? this.innerEvent.offsetX : this.innerEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
 	};
 	
 	this.getY = function(){
-		return this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - mainCanvas.getBoundingClientRect().top;
+		return this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
 	};
 }
 
