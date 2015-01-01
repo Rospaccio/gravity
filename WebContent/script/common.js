@@ -5,13 +5,14 @@
 var G = 6.673E-11;
 var EARTH_MASS = 	5.972E+24;
 var MOON_MASS = 	7.348E+22
+var JUPITER_MASS = 1.8986E+27;
 var EARTH_MOON_DISTANCE = 384400000; //384,400 Km
 
-var EARTH_MOON_SCREEN_DISTANCE = 350;
+var EARTH_MOON_SCREEN_DISTANCE = 300;
 
 var DISTANCE_SCALE_FACTOR = EARTH_MOON_DISTANCE / EARTH_MOON_SCREEN_DISTANCE;
 
-var STEP_INTERVAL = 0.41; // 0.041 for 24 frames per seconds
+var STEP_INTERVAL = 0.40; // 0.041 for 24 frames per seconds
 
 var VX_DEFAULT = 0;
 var VY_DEFAULT = 0;
@@ -39,8 +40,8 @@ function wrapWithMassProperty(svgElement, mass)
 	svgElement.ax = 0;
 	svgElement.ay = 0;
 	
-	svgElement.vx = VX_DEFAULT;
-	svgElement.vy = VY_DEFAULT;
+	svgElement.vx = 0;
+	svgElement.vy = 0;
 	
 	svgElement.traceCounter = 0;
 	
@@ -87,20 +88,19 @@ function wrapWithMassProperty(svgElement, mass)
 		var fx = forceMagnitude * xRatio;
 		var fy = forceMagnitude * yRatio;
 		
-		this.ax += fx / this.mass;
-		this.ay += fy / this.mass;
-	}
+		this.ax = this.ax + fx / this.mass;
+		this.ay = this.ay + fy / this.mass;
+	};
 	
 	svgElement.updatePosition = function(){
-
-		this.vx += this.ax * STEP_INTERVAL;
-		this.vy += this.ay * STEP_INTERVAL;
+		this.vx = this.vx + this.ax * STEP_INTERVAL;
+		this.vy = this.vy + this.ay * STEP_INTERVAL;
 		
-		var nextX = this.getX() + (this.vx * STEP_INTERVAL) + (1/2 * this.ax * STEP_INTERVAL * STEP_INTERVAL);
-		var nextY = this.getY() + (this.vy * STEP_INTERVAL) + (1/2 * this.ay * STEP_INTERVAL * STEP_INTERVAL);
+		var nextX = this.getX() + (this.vx * STEP_INTERVAL);// + (1/2 * this.ax * STEP_INTERVAL * STEP_INTERVAL);
+		var nextY = this.getY() + (this.vy * STEP_INTERVAL);// + (1/2 * this.ay * STEP_INTERVAL * STEP_INTERVAL);
 		
-//		var nextX = this.getX() + (1/2 * this.ax * STEP_INTERVAL);
-//		var nextY = this.getY() + (1/2 * this.ay * STEP_INTERVAL);
+//		var nextX = this.getX() + (1/2 * this.ax * STEP_INTERVAL * STEP_INTERVAL);
+//		var nextY = this.getY() + (1/2 * this.ay * STEP_INTERVAL * STEP_INTERVAL);
 		
 //		console.log("new position: (" + nextX + ", " + nextY + ")");
 		

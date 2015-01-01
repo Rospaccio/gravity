@@ -115,8 +115,8 @@ function animateShapeFrame(svgShape) {
 		if (shapes[i].id != svgShape.id) {
 			if (svgShape.overlaps(shapes[i])) {
 				svgShape.mass += shapes[i].mass;
-//				svgShape.vx += shapes[i].vx;
-//				svgShape.vy += shapes[i].vy;
+				svgShape.vx += shapes[i].vx / (svgShape.mass - shapes[i].mass);
+				svgShape.vy += shapes[i].vy / (svgShape.mass - shapes[i].mass);
 				/* marks the overlapping shape for removal */
 				shapes[i].toBeRemoved = true;
 				continue;
@@ -174,11 +174,11 @@ function createCircle(circleId, centerX, centerY, radius, color)
 	return element;
 }
 
-function addCircle(circleId, centerX, centerY, radius, color){
-	var element = createCircle(circleId, centerX, centerY, radius, color);
-	shapes.push(element);
-	return element;
-}
+//function addCircle(circleId, centerX, centerY, radius, color){
+//	var element = createCircle(circleId, centerX, centerY, radius, color);
+//	shapes.push(element);
+//	return element;
+//}
 
 //function onSvgMouseDown(mouseEvent) {
 //	mouseEvent = mouseEvent || window.event;
@@ -242,6 +242,11 @@ function setMoonMode(){
 function setEarthMode(){
 	selectedColor = 'blue';
 	selectedMass = EARTH_MASS;
+}
+
+function setJupiterMode(){
+	selectedColor = 'maroon';
+	selectedMass = JUPITER_MASS;
 }
 
 function toggleTraces(){
