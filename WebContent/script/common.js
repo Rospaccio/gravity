@@ -8,11 +8,11 @@ var MOON_MASS = 	7.348E+22
 var JUPITER_MASS = 1.8986E+27;
 var EARTH_MOON_DISTANCE = 384400000; //384,400 Km
 
-var EARTH_MOON_SCREEN_DISTANCE = 300;
+var EARTH_MOON_SCREEN_DISTANCE = 50;
 
 var DISTANCE_SCALE_FACTOR = EARTH_MOON_DISTANCE / EARTH_MOON_SCREEN_DISTANCE;
 
-var STEP_INTERVAL = 0.40; // 0.041 for 24 frames per seconds
+var STEP_INTERVAL = 0.41; // 0.041 for 24 frames per seconds
 
 var VX_DEFAULT = 0;
 var VY_DEFAULT = 0;
@@ -112,8 +112,8 @@ function wrapWithMassProperty(svgElement, mass)
 	};
 	
 	svgElement.drawTrace = function(){
-		if(++this.traceCounter % 10 == 0){
-			var traceElement = createCircle("trace", this.getX(), this.getY(), 1, 'black');
+		if(++this.traceCounter % 20 == 0){
+			var traceElement = createCircle("trace", this.getX(), this.getY(), 1, this.getAttribute('fill'));
 			traceElement.setAttribute('name', 'trace');
 		}
 	};

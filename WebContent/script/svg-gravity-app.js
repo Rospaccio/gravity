@@ -10,6 +10,8 @@ var Y_STEP = 2;
 
 var SPEED_SCALE_FACTOR = 1 / 200;
 
+var SVG_CIRCLE_WIDTH = 5;
+
 var selectedMass = MOON_MASS;
 var selectedColor = 'grey';
 
@@ -195,7 +197,7 @@ function onSvgMouseDown(mouseEvent) {
 	var x = mouseEvent.getX();
 	var y = mouseEvent.getY();
 	
-	var circle = createCircle('circle_' + nextId(), x, y, 10, selectedColor);
+	var circle = createCircle('circle_' + nextId(), x, y, SVG_CIRCLE_WIDTH, selectedColor);
 	
 	getSvgCanvas().onmousemove = function(event){ drawSpeedVector(new MultiBrowserMouseEvent(event)) };
 	
