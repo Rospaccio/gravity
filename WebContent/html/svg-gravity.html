@@ -22,7 +22,9 @@
 		<div>
 			<div style="float: left;">
 				<svg id="svgCanvas" width="1400" height="800" style="border-style: solid; border-width: 1px;">
-
+					<g id="canvasTranslation" transform="translate(0, 0)">
+						
+					</g>
 				</svg>
 			</div>
 			<div id="rightBox" style="float: left;">
@@ -47,7 +49,7 @@
 			<input type="button" id="stopButton" name="stopButton" value="STOP" onclick="stop();"/> 
 			<input type="button" id="resetButton" value="RESET" onclick="reset();" />
 			<input type="button" id="traceButton" value="TRACES" onclick="toggleTraces();"/>
-			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="$('[name=\'trace\']').each( function() { getSvgCanvas().removeChild(this); } )"/>
+			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="$('[name=\'trace\']').each( function() { document.getElementById('canvasTranslation').removeChild(this); } )"/>
 		</div>
 	</body>
 	<script type="text/javascript">

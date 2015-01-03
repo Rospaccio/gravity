@@ -17,6 +17,8 @@ var selectedColor = 'grey';
 
 var tracesActive = false;
 
+var idCounter = 0;
+
 /*
  * s = v * t;
  * v expressed in m/s
@@ -61,7 +63,7 @@ function stop(){
 function reset(){
 	$(shapes).each(
 			function(){
-				getSvgCanvas().removeChild(this);
+				document.getElementById("canvasTranslation").removeChild(this);
 			}
 		);
 	shapes = new Array();
@@ -83,7 +85,7 @@ function gameLoop()
 	/* checks for shapes to remove */
 	for(i = 0; i < shapes.length; i++){
 		if(shapes[i].toBeRemoved){
-			getSvgCanvas().removeChild(shapes[i]);
+			document.getElementById("canvasTranslation").removeChild(shapes[i]);
 			shapes.splice(i, 1);
 		}
 	}
@@ -150,20 +152,7 @@ function moveYStep(stepLength){
 //}
 
 function createCircle(circleId, centerX, centerY, radius, color)
-{
-	if(centerX <= 0 + radius){
-		centerX = radius + 1;
-	}
-	if(centerX > getMaxX() - radius){
-		centerX = getMaxX() - radius;
-	}
-	if(centerY <= 0 + radius){
-		centerY = radius + 1;
-	}
-	if(centerY > getMaxY() - radius){
-		centerY = getMaxY() - radius;
-	}
-	
+{	
 	var element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 	element.setAttribute('id', circleId);
 	element.setAttribute('cx', centerX);
@@ -171,7 +160,7 @@ function createCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
 	wrapWithMassProperty(element, selectedMass);
-	getSvgCanvas().appendChild(element)
+	document.getElementById("canvasTranslation").appendChild(element)
 //	console.log(shapes);
 	return element;
 }
@@ -208,7 +197,7 @@ function onSvgMouseDown(mouseEvent) {
 	lastVectorLine.setAttribute('x2', mouseEvent.getX());
 	lastVectorLine.setAttribute('y2', mouseEvent.getY());
 	lastVectorLine.setAttribute('style', "stroke:rgb(255,0,0);stroke-width:1");
-	getSvgCanvas().appendChild(lastVectorLine);
+	document.getElementById("canvasTranslation").appendChild(lastVectorLine);
 	//
 	
 	getSvgCanvas().onmouseup = function(event){ onMouseUpAdd(circle) };
@@ -231,7 +220,7 @@ function onMouseUpAdd(circle){
 	circle.vy = graphicYDiff * SPEED_SCALE_FACTOR;
 	
 	shapes.push(circle);
-	getSvgCanvas().removeChild(lastVectorLine);
+	document.getElementById("canvasTranslation").removeChild(lastVectorLine);
 	getSvgCanvas().onmousemove = function(e){};
 	console.log('END')
 }
@@ -256,9 +245,6 @@ function toggleTraces(){
 }
 
 function nextId(){
-	return shapes.length + 1;
-}
-
-function calculateOffsetX(){
-	
+	idCounter++;
+	return idCounter;
 }

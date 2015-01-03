@@ -1,6 +1,13 @@
 /**
  * 
  */
+function testTranslate(x, y){
+
+	var transform = document.getElementById('canvasTranslation');
+	transform.setAttribute("transform", "translate(" + x + ", " + y + ")");
+}
+
+
 function testDivSize(){
 	window
 }

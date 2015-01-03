@@ -113,7 +113,7 @@ function wrapWithMassProperty(svgElement, mass)
 	
 	svgElement.drawTrace = function(){
 		if(++this.traceCounter % 20 == 0){
-			var traceElement = createCircle("trace", this.getX(), this.getY(), 1, this.getAttribute('fill'));
+			var traceElement = createCircle("trace_" + nextId(), this.getX(), this.getY(), 1, this.getAttribute('fill'));
 			traceElement.setAttribute('name', 'trace');
 		}
 	};
