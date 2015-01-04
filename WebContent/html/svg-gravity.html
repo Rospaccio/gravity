@@ -37,14 +37,14 @@
 				</div>
 				<div id="translateButtonsBox" style="text-align: center;">
 					<div id="upperBox">
-						<input type="button" value="UP" onclick="CanvasManager.translate(0, 20);"/>
+						<input type="button" value="UP" onclick="CanvasManager.translate(0, TRANSLATION_STEP);"/>
 					</div>
 					<div id="middleBox">
-						<input type="button" value="LEFT" onclick="CanvasManager.translate(20, 0);"/>
-						<input type="button" value="RIGHT" onclick="CanvasManager.translate(-20, 0);"/>
+						<input type="button" value="LEFT" onclick="CanvasManager.translate(TRANSLATION_STEP, 0);"/>
+						<input type="button" value="RIGHT" onclick="CanvasManager.translate(-TRANSLATION_STEP, 0);"/>
 					</div>
 					<div id="bottomBox" style="text-align: center;">
-						<input type="button" value="DOWN" onclick="CanvasManager.translate(0, -20);"/>
+						<input type="button" value="DOWN" onclick="CanvasManager.translate(0, -TRANSLATION_STEP);"/>
 					</div>
 				</div>
 				

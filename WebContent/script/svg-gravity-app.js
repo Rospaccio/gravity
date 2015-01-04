@@ -4,6 +4,7 @@
 
 var CANVAS_ID = "svgCanvas";
 var TRANSFORM_ID = "canvasTranslation";
+var TRANSLATION_STEP = 50;
 var running = false;
 
 var X_STEP = 2;
