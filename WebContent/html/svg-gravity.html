@@ -31,6 +31,14 @@
 				<div> <input type="button" value="Earth Mass" onclick="setEarthMode();" /> </div>
 				<div> <input type="button" value="Moon Mass" onclick="setMoonMode();"/> </div>
 				<div> <input type="button" value="Jupiter Mass" onclick="setJupiterMode();"/> </div>
+				
+				<div id="translateButtonsBox">
+					<input type="button" value="UP" onclick="CanvasManager.translate(0, 20);"/>
+					<input type="button" value="DOWN" onclick="CanvasManager.translate(0, -20);"/>
+					<input type="button" value="LEFT" onclick="CanvasManager.translate(20, 0);"/>
+					<input type="button" value="RIGHT" onclick="CanvasManager.translate(-20, 0);"/>
+				</div>
+				
 			</div>
 
 			<div>
@@ -49,7 +57,7 @@
 			<input type="button" id="stopButton" name="stopButton" value="STOP" onclick="stop();"/> 
 			<input type="button" id="resetButton" value="RESET" onclick="reset();" />
 			<input type="button" id="traceButton" value="TRACES" onclick="toggleTraces();"/>
-			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="$('[name=\'trace\']').each( function() { document.getElementById('canvasTranslation').removeChild(this); } )"/>
+			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="clearTraces();"/>
 		</div>
 	</body>
 	<script type="text/javascript">

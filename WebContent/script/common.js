@@ -22,12 +22,22 @@ var traceCounter = 0;
 function MultiBrowserMouseEvent(innerEvent){
 	this.innerEvent = innerEvent;
 	
+	this.xTranslation = 0;
+	this.yTranslation = 0;
+	
 	this.getX = function(){
-		return this.innerEvent.offsetX ? this.innerEvent.offsetX : this.innerEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
+		var notTranslated = this.innerEvent.offsetX ? this.innerEvent.offsetX : this.innerEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
+		return notTranslated - this.xTranslation;
 	};
 	
 	this.getY = function(){
-		return this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+		var notTranslated = this.innerEvent.offsetY ? this.innerEvent.offsetY : this.innerEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
+		return notTranslated - this.yTranslation;
+	};
+	
+	this.translate = function(translation){
+		this.xTranslation = translation.x;
+		this.yTranslation = translation.y;
 	};
 }
 

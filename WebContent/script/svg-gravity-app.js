@@ -2,7 +2,8 @@
  * 
  */
 
-var CIRCLE_ID = "testShape";
+var CANVAS_ID = "svgCanvas";
+var TRANSFORM_ID = "canvasTranslation";
 var running = false;
 
 var X_STEP = 2;
@@ -18,6 +19,13 @@ var selectedColor = 'grey';
 var tracesActive = false;
 
 var idCounter = 0;
+
+var currentTranslation = new (
+		function CanvasTranslation(){
+			this.x = 0;
+			this.y = 0;
+		}
+		)();
 
 /*
  * s = v * t;
@@ -63,10 +71,19 @@ function stop(){
 function reset(){
 	$(shapes).each(
 			function(){
-				document.getElementById("canvasTranslation").removeChild(this);
+				CanvasManager.eraseShape(this);
 			}
 		);
 	shapes = new Array();
+}
+
+function clearTraces(){
+	$('[name="trace"]').each( 
+			function() 
+			{ 
+				CanvasManager.eraseShape(this); 
+			} 
+	);
 }
 
 function getSvgCanvas(){
@@ -85,7 +102,7 @@ function gameLoop()
 	/* checks for shapes to remove */
 	for(i = 0; i < shapes.length; i++){
 		if(shapes[i].toBeRemoved){
-			document.getElementById("canvasTranslation").removeChild(shapes[i]);
+			CanvasManager.eraseShape(shapes[i]);
 			shapes.splice(i, 1);
 		}
 	}
@@ -160,28 +177,14 @@ function createCircle(circleId, centerX, centerY, radius, color)
 	element.setAttribute('r', radius);
 	element.setAttribute('fill', color);
 	wrapWithMassProperty(element, selectedMass);
-	document.getElementById("canvasTranslation").appendChild(element)
+	CanvasManager.drawShape(element);
 //	console.log(shapes);
 	return element;
 }
 
-//function addCircle(circleId, centerX, centerY, radius, color){
-//	var element = createCircle(circleId, centerX, centerY, radius, color);
-//	shapes.push(element);
-//	return element;
-//}
-
-//function onSvgMouseDown(mouseEvent) {
-//	mouseEvent = mouseEvent || window.event;
-//	console.log(mouseEvent);
-//	
-//	var x = mouseEvent.offsetX ? mouseEvent.offsetX : mouseEvent.clientX - getSvgCanvas().getBoundingClientRect().left;
-//	var y = mouseEvent.offsetY ? mouseEvent.offsetY : mouseEvent.clientY - getSvgCanvas().getBoundingClientRect().top;
-//	
-//	addCircle('circle_' + nextId(), x, y, 10, 'grey');
-//}
-
 function onSvgMouseDown(mouseEvent) {
+	
+	mouseEvent.translate(currentTranslation);
 	
 	var x = mouseEvent.getX();
 	var y = mouseEvent.getY();
@@ -197,13 +200,14 @@ function onSvgMouseDown(mouseEvent) {
 	lastVectorLine.setAttribute('x2', mouseEvent.getX());
 	lastVectorLine.setAttribute('y2', mouseEvent.getY());
 	lastVectorLine.setAttribute('style', "stroke:rgb(255,0,0);stroke-width:1");
-	document.getElementById("canvasTranslation").appendChild(lastVectorLine);
+	CanvasManager.drawShape(lastVectorLine);
 	//
 	
 	getSvgCanvas().onmouseup = function(event){ onMouseUpAdd(circle) };
 }
 
 function drawSpeedVector(mouseEvent){
+	mouseEvent.translate(currentTranslation);
 	lastVectorLine.setAttribute('x2', mouseEvent.getX());
 	lastVectorLine.setAttribute('y2', mouseEvent.getY());
 }
@@ -220,7 +224,7 @@ function onMouseUpAdd(circle){
 	circle.vy = graphicYDiff * SPEED_SCALE_FACTOR;
 	
 	shapes.push(circle);
-	document.getElementById("canvasTranslation").removeChild(lastVectorLine);
+	CanvasManager.eraseShape(lastVectorLine);
 	getSvgCanvas().onmousemove = function(e){};
 	console.log('END')
 }
@@ -247,4 +251,29 @@ function toggleTraces(){
 function nextId(){
 	idCounter++;
 	return idCounter;
+}
+
+function CanvasManager(){
+}
+
+CanvasManager.drawShape = function(shape){
+	document.getElementById(TRANSFORM_ID).appendChild(shape);
+}
+
+CanvasManager.eraseShape = function(shape){
+	document.getElementById(TRANSFORM_ID).removeChild(shape);
+}
+
+CanvasManager.translate = function(xAdditionalShift, yAdditionalShift){
+	currentTranslation.x += xAdditionalShift;
+	currentTranslation.y += yAdditionalShift;
+	var transform = document.getElementById(TRANSFORM_ID);
+	transform.setAttribute("transform", "translate(" + currentTranslation.x + ", " + currentTranslation.y + ")");
+}
+
+CanvasManager.resetTranslation = function(){
+	currentTranslation.x = 0;
+	currentTranslation.y = 0;
+	var transform = document.getElementById(TRANSFORM_ID);
+	transform.setAttribute("transform", "translate(0, 0)");
 }
