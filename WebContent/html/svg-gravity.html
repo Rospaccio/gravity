@@ -67,6 +67,10 @@
 			<input type="button" id="resetButton" value="RESET" onclick="reset();" />
 			<input type="button" id="traceButton" value="TRACES" onclick="toggleTraces();"/>
 			<input type="button" id="clearTraces" value="CLEAR TRACES" onclick="clearTraces();"/>
+			<input type="button" id="save" value="SAVE" onclick="save();"/>
+		</div>
+		<div id="outputBox">
+			<textarea id="saveOutputArea" onclick="this.select();"></textarea>
 		</div>
 	</body>
 	<script type="text/javascript">

@@ -4,6 +4,7 @@
 
 var CANVAS_ID = "svgCanvas";
 var TRANSFORM_ID = "canvasTranslation";
+var SAVE_OUT_AREA_ID = "saveOutputArea"; 
 var TRANSLATION_STEP = 50;
 var running = false;
 
@@ -277,4 +278,14 @@ CanvasManager.resetTranslation = function(){
 	currentTranslation.y = 0;
 	var transform = document.getElementById(TRANSFORM_ID);
 	transform.setAttribute("transform", "translate(0, 0)");
+}
+
+CanvasManager.serializeState = function(){
+	var canvas = getSvgCanvas();
+	return canvas.outerHTML;
+}
+
+function save(){
+	var textState = CanvasManager.serializeState();
+	$("#" + SAVE_OUT_AREA_ID).html(textState);
 }
