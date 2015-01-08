@@ -184,6 +184,30 @@ function createCircle(circleId, centerX, centerY, radius, color)
 	return element;
 }
 
+function createRectangle(id, x, y, width, height, fill){
+	var rectElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+	rectElement.setAttribute('x', x);
+	rectElement.setAttribute('y', y);
+	rectElement.setAttribute('width', width);
+	rectElement.setAttribute('height', height);
+	rectElement.setAttribute('fill', fill)
+	rectElement.setAttribute('id', id);
+	CanvasManager.drawShape(rectElement);
+	return rectElement;
+}
+
+//function createLine(x1, y1, x2, y2){
+//	var lineElement = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+//	lineElement.setAttribute('id', 'trace_' + nextId());
+//	lineElement.setAttribute('x1', x1);
+//	lineElement.setAttribute('y1', y1);
+//	lineElement.setAttribute('x2', x2);
+//	lineElement.setAttribute('y2', y2);
+//	lineElement.setAttribute('style', "stroke:rgb(255,0,0);stroke-width:2");
+//	CanvasManager.drawShape(lineElement);
+//	return lineElement;
+//}
+
 function onSvgMouseDown(mouseEvent) {
 	
 	mouseEvent.translate(currentTranslation);
@@ -287,5 +311,39 @@ CanvasManager.serializeState = function(){
 
 function save(){
 	var textState = CanvasManager.serializeState();
-	$("#" + SAVE_OUT_AREA_ID).html(textState);
+	
+	var script = document.createElement('script');
+	var spaceBodyInfos = new Object();
+	var bodyIndex = 0;
+	
+	$(shapes).each(function(){
+		spaceBodyInfos[bodyIndex] = new SpaceBodyInfo(this.id, this.mass, this.vx, this.vy);
+		bodyIndex++;
+	});
+	
+	script.innerHTML = "savedSpaceBodyInfos = " + JSON.stringify(spaceBodyInfos) + ";";
+	textState += script.outerHTML;
+	$("#" + SAVE_OUT_AREA_ID).text(textState);
+}
+
+function SpaceBodyInfo(id, mass, vx, vy){
+	this.id = id;
+	this.mass = mass;
+	this.vx = vx;
+	this.vy = vy;
+}
+
+function restoreFromOutputArea(){
+	var text = $("#" + SAVE_OUT_AREA_ID).text();
+	restoreState(text);
+}
+
+function restoreState(serializedAppState){
+	var restoreBox = document.createElement('div');
+	$(restoreBox).html(serializedAppState);
+	var svg = $(restoreBox).children('svg');
+	getSvgCanvas().innerHTML = svg.html();
+	
+	// TODO: restore gravitational properties
+	
 }
