@@ -306,7 +306,9 @@ CanvasManager.resetTranslation = function(){
 
 CanvasManager.serializeState = function(){
 	var canvas = getSvgCanvas();
-	return canvas.outerHTML;
+	canvas = $(canvas);
+	var traces = $(canvas).find('[name="trace"]').remove();
+	return canvas.parent().html();
 }
 
 function saveSpaceBodies(){
