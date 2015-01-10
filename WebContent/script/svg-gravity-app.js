@@ -309,21 +309,21 @@ CanvasManager.serializeState = function(){
 	return canvas.outerHTML;
 }
 
-function save(){
+function saveSpaceBodies(){
 	var textState = CanvasManager.serializeState();
 	
 	var script = document.createElement('script');
-	var spaceBodyInfos = new Object();
+	var spaceBodyInfos = new Array();
 	var bodyIndex = 0;
 	
-	$(shapes).each(function(){
-		spaceBodyInfos[bodyIndex] = new SpaceBodyInfo(this.id, this.mass, this.vx, this.vy);
+	$(shapes).select('[id*="circle"]').each(function(){
+		spaceBodyInfos.push(new SpaceBodyInfo(this.id, this.mass, this.vx, this.vy));
 		bodyIndex++;
 	});
 	
-	script.innerHTML = "savedSpaceBodyInfos = " + JSON.stringify(spaceBodyInfos) + ";";
+	script.innerHTML = JSON.stringify(spaceBodyInfos);
 	textState += script.outerHTML;
-	$("#" + SAVE_OUT_AREA_ID).text(textState);
+	$("#" + SAVE_OUT_AREA_ID).val(textState);
 }
 
 function SpaceBodyInfo(id, mass, vx, vy){
@@ -334,16 +334,37 @@ function SpaceBodyInfo(id, mass, vx, vy){
 }
 
 function restoreFromOutputArea(){
-	var text = $("#" + SAVE_OUT_AREA_ID).text();
+	var text = $("#" + SAVE_OUT_AREA_ID).val();
 	restoreState(text);
 }
 
 function restoreState(serializedAppState){
+	stop();
+	reset();
+	clearTraces();
+	
 	var restoreBox = document.createElement('div');
-	$(restoreBox).html(serializedAppState);
-	var svg = $(restoreBox).children('svg');
-	getSvgCanvas().innerHTML = svg.html();
+	restoreBox = $(restoreBox);
+	restoreBox.html(serializedAppState);
+	var circles = restoreBox.find('circle');
+	
+	$(circles).each(
+			function(){
+				CanvasManager.drawShape(this);
+			}
+	);
 	
 	// TODO: restore gravitational properties
-	
+	var jsonString = restoreBox.children('script').html();
+	var infos = JSON.parse(jsonString);
+	$(infos).each(
+			function(){
+				var id = this.id;
+				var svgShape = document.getElementById(id);
+				wrapWithMassProperty(svgShape, this.mass);
+				svgShape.vx = this.vx;
+				svgShape.vy = this.vy;
+				shapes.push(svgShape);
+			}
+	);
 }
