@@ -3,16 +3,18 @@ function threeApp()
 	var scene = new THREE.Scene();
 	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 	var renderer = new THREE.WebGLRenderer();
-        var cameraDirection = 1;
+	var elapsedTime = 0;
+    var cameraDirection = 1;
+    var direction = 1;
 	
 	var clock = new THREE.Clock();
-	// var cameraControls; /*, effectController;*/
+	var cameraControls; /*, effectController;*/
 	
 	renderer.gammaInput = true;
 	renderer.gammaOutput = true;
 	renderer.setClearColor( 0xffffff, 1.0 );
 	
-	scene.fog = new THREE.Fog( 0x111111, 4, 10 );
+	scene.fog = new THREE.Fog( 0x111111, 4, 20 );
 	//Ligths
 	var ambientLight = new THREE.AmbientLight( 0x111111 );
 	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
@@ -29,53 +31,75 @@ function threeApp()
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
-	var geometry = new THREE.CubeGeometry(1, 1, 1);
-//	var material = new THREE.MeshBasicMaterial( {color : 0x00f233} );
-	material = new THREE.MeshLambertMaterial( {color : 0xfff233} );
-	var cube = new THREE.Mesh(geometry, material);
-	cube.position.x = -2;
-	scene.add(cube);
+//	var geometry = new THREE.CubeGeometry(1, 1, 1);
+////	var material = new THREE.MeshBasicMaterial( {color : 0x00f233} );
+//	material = new THREE.MeshLambertMaterial( {color : 0xfff233} );
+//	var cube = new THREE.Mesh(geometry, material);
+//	cube.position.x = -2;
+//	scene.add(cube);
 	
-	geometry = new THREE.CubeGeometry(1,3,1);
-	material = new THREE.MeshLambertMaterial({ color : 0xff44ff});
-	var parall = new THREE.Mesh(geometry, material);
-	parall.position.x = 2;
-	scene.add(parall);
+//	geometry = new THREE.CubeGeometry(1,3,1);
+//	material = new THREE.MeshLambertMaterial({ color : 0xff44ff});
+//	var parall = new THREE.Mesh(geometry, material);
+//	parall.position.x = 2;
+//	scene.add(parall);
 
-        geometry = new THREE.SphereGeometry( .5, 32, 32 );
-        material = new THREE.MeshLambertMaterial( {color: 0xffff00} );
-        sphere = new THREE.Mesh( geometry, material );
-        scene.add( sphere );
+    var planetGeometry = new THREE.SphereGeometry( .5, 64, 64 );
+    material = new THREE.MeshLambertMaterial( {color: 0xffff00} );
+    planetSphere = new THREE.Mesh( planetGeometry, material );
+    scene.add( planetSphere );
 
-	camera.position.z = 5;
+    var moonGeometry = new THREE.SphereGeometry( .5, 64, 64 );
+    material = new THREE.MeshLambertMaterial( {color: 0xff0000} );
+    moonSphere = new THREE.Mesh( moonGeometry, material );
+    scene.add( moonSphere );
+    
+    moonSphere.position.x = 6;
+    moonSphere.position.y = 3.5;
+    moonSphere.position.z = -4.5;
+    
+	camera.position.z = 12;
 
-//      cameraControls = new THREE.Camera();
+//	cameraControls = new THREE.Camera();
 //	cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
 //	console.log("cameraControls.target = " + cameraControls.target);
 //	cameraControls.target.set(0,15,0);
 	
 	function render()
 	{	
-//		var delta = clock.getDelta();
+		var delta = clock.getDelta();
+		elapsedTime += delta;
 //		cameraControls.update(delta);
 		requestAnimationFrame(render);
                 
-                // -----------------------------------------------------------
-//                var currentZ = camera.position.z += cameraDirection * 0.02;
-//                camera.position.x += cameraDirection * 0.01;
-//                camera.position.y += cameraDirection * 0.01;
-//                console.log("camera.position.z = " + camera.position.z);
-//                if(cameraDirection >= 1 && currentZ > 10)
-//                    cameraDirection = -1;
-//                if(cameraDirection <= -1 && currentZ < 5)
-//                    cameraDirection = 1;
+        // -----------------------------------------------------------
+//        var currentZ = camera.position.z += cameraDirection * 0.02;
+//        camera.position.x += cameraDirection * 0.01;
+//        camera.position.y += cameraDirection * 0.01;
+//        console.log("camera.position.z = " + camera.position.z);
+//        if(cameraDirection >= 1 && currentZ > 10)
+//            cameraDirection = -1;
+//        if(cameraDirection <= -1 && currentZ < 5)
+//            cameraDirection = 1;
 //                
-		cube.rotation.x += 0.005;
-		cube.rotation.y += 0.005;
-
-		parall.rotation.z += 0.004;
-		parall.rotation.y +=.005;
+//		cube.rotation.x += 0.005;
+//		cube.rotation.y += 0.005;
+//
+//		parall.rotation.z += 0.004;
+//		parall.rotation.y +=.005;
                 // -----------------------------------------------------------
+		
+		var squareElapsedTime = elapsedTime * elapsedTime
+
+		var moonX = 6 * Math.cos(elapsedTime);
+		var moonY = 3.5 * Math.sin(elapsedTime);
+		var moonZ = -4.5 * Math.sin(elapsedTime);
+		
+//		console.log(moonX + ", " + moonY);
+		
+		moonSphere.position.x = moonX;
+		moonSphere.position.y = moonY;
+		moonSphere.position.z = moonZ;
                 
 		renderer.render(scene, camera);
 	}
