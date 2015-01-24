@@ -1,8 +1,14 @@
 function threeApp()
 {
 	var scene = new THREE.Scene();
-	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	var width = 40;
+	
+	//var height = 40 / ( window.innerWidth / window.innerHeight);
+	//var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
+	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 4000);
+	
 	var renderer = new THREE.WebGLRenderer();
+	
 	var elapsedTime = 0;
     var cameraDirection = 1;
     var direction = 1;
@@ -14,9 +20,9 @@ function threeApp()
 	renderer.gammaOutput = true;
 	renderer.setClearColor( 0xffffff, 1.0 );
 	
-	scene.fog = new THREE.Fog( 0x111111, 4, 20 );
+//	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
 	//Ligths
-	var ambientLight = new THREE.AmbientLight( 0x111111 );
+	var ambientLight = new THREE.AmbientLight( 0x000000 );
 	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 	light.position.set( 200, 400, 500 );
 
@@ -25,7 +31,7 @@ function threeApp()
 
 	scene.add(ambientLight);
 	scene.add(light);
-	scene.add(light2);
+//	scene.add(light2);
 	//Lights end
 	
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -44,21 +50,27 @@ function threeApp()
 //	parall.position.x = 2;
 //	scene.add(parall);
 
-    var planetGeometry = new THREE.SphereGeometry( .5, 64, 64 );
+    var planetGeometry = new THREE.SphereGeometry( .5, 64, 64);
     material = new THREE.MeshLambertMaterial( {color: 0xffff00} );
     planetSphere = new THREE.Mesh( planetGeometry, material );
     scene.add( planetSphere );
 
-    var moonGeometry = new THREE.SphereGeometry( .5, 64, 64 );
+    var moonGeometry = new THREE.SphereGeometry( .5, 64, 64);
     material = new THREE.MeshLambertMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
     scene.add( moonSphere );
     
+    //
+	drawAxis(scene);
+    //
+    
     moonSphere.position.x = 6;
-    moonSphere.position.y = 3.5;
+    moonSphere.position.y = 0;
     moonSphere.position.z = -4.5;
     
 	camera.position.z = 12;
+	camera.position.x = 2;
+	camera.position.y = 2;
 
 //	cameraControls = new THREE.Camera();
 //	cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
@@ -92,7 +104,7 @@ function threeApp()
 		var squareElapsedTime = elapsedTime * elapsedTime
 
 		var moonX = 6 * Math.cos(elapsedTime);
-		var moonY = 3.5 * Math.sin(elapsedTime);
+		var moonY = Math.sin(elapsedTime * 6);
 		var moonZ = -4.5 * Math.sin(elapsedTime);
 		
 //		console.log(moonX + ", " + moonY);
@@ -105,4 +117,29 @@ function threeApp()
 	}
 	
 	render();
+}
+
+function drawAxis(scene){
+	
+	var AXIS_EXTREME = 10; 
+	
+	var geometry = new THREE.Geometry();
+	var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.9 });
+	
+	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, 0));
+	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, 0));
+	var xAxis =  new THREE.Line(geometry, lineMaterial);
+	scene.add(xAxis);
+	
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(0, -AXIS_EXTREME, 0));
+	geometry.vertices.push(new THREE.Vector3(0, AXIS_EXTREME, 0));
+	var yAxis = new THREE.Line(geometry, lineMaterial);
+	scene.add(yAxis);
+	
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(0, 0, -AXIS_EXTREME));
+	geometry.vertices.push(new THREE.Vector3(0, 0, AXIS_EXTREME));
+	var zAxis = new THREE.Line(geometry, lineMaterial);
+	scene.add(zAxis);
 }
