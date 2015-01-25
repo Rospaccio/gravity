@@ -5,8 +5,9 @@ function threeApp()
 	
 //	var height = 40 / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
-	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 4000);
+	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
 	
+	var controls;
 	var renderer = new THREE.WebGLRenderer();
 	
 	var elapsedTime = 0;
@@ -26,7 +27,7 @@ function threeApp()
 	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 	light.position.set( 200, 400, 500 );
 
-	var light2 = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+	var light2 = new THREE.DirectionalLight( 0x00FF00, 1.0 );
 	light2.position.set( -400, 200, -300 );
 
 	scene.add(ambientLight);
@@ -69,9 +70,22 @@ function threeApp()
     moonSphere.position.z = -4.5;
     
 	camera.position.z = 12;
-	camera.position.x = 2;
-	camera.position.y = 2;
+	camera.position.x = -2;
+	camera.position.y = 4;
+	camera.rotation.x = - Math.PI / 8;
+	camera.rotation.y = - Math.PI / 8;
+	camera.rotation.z = - Math.PI / 24;
 
+	controls = new THREE.TrackballControls( camera );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3; 
+	
+	// this is obsolete code
 //	cameraControls = new THREE.Camera();
 //	cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
 //	console.log("cameraControls.target = " + cameraControls.target);
@@ -112,7 +126,9 @@ function threeApp()
 		moonSphere.position.x = moonX;
 		moonSphere.position.y = moonY;
 		moonSphere.position.z = moonZ;
-                
+        
+		controls.update();
+		
 		renderer.render(scene, camera);
 	}
 	
@@ -124,13 +140,14 @@ function drawAxis(scene){
 	var AXIS_EXTREME = 10; 
 	
 	var geometry = new THREE.Geometry();
-	var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.9 });
+	var lineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000, opacity: 0.9 });
 	
 	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, 0));
 	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, 0));
 	var xAxis =  new THREE.Line(geometry, lineMaterial);
 	scene.add(xAxis);
 	
+	lineMaterial = new THREE.LineBasicMaterial({ color: 0x00FF00, opacity: 0.9 });
 	geometry = new THREE.Geometry();
 	geometry.vertices.push(new THREE.Vector3(0, -AXIS_EXTREME, 0));
 	geometry.vertices.push(new THREE.Vector3(0, AXIS_EXTREME, 0));
