@@ -3,8 +3,8 @@ function threeApp()
 	var scene = new THREE.Scene();
 	var width = 40;
 	
-	//var height = 40 / ( window.innerWidth / window.innerHeight);
-	//var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
+//	var height = 40 / ( window.innerWidth / window.innerHeight);
+//	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
 	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 4000);
 	
 	var renderer = new THREE.WebGLRenderer();
@@ -51,12 +51,12 @@ function threeApp()
 //	scene.add(parall);
 
     var planetGeometry = new THREE.SphereGeometry( .5, 64, 64);
-    material = new THREE.MeshLambertMaterial( {color: 0xffff00} );
+    material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
     planetSphere = new THREE.Mesh( planetGeometry, material );
     scene.add( planetSphere );
 
     var moonGeometry = new THREE.SphereGeometry( .5, 64, 64);
-    material = new THREE.MeshLambertMaterial( {color: 0xff0000} );
+    material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
     scene.add( moonSphere );
     
@@ -99,7 +99,7 @@ function threeApp()
 //
 //		parall.rotation.z += 0.004;
 //		parall.rotation.y +=.005;
-                // -----------------------------------------------------------
+		// -----------------------------------------------------------
 		
 		var squareElapsedTime = elapsedTime * elapsedTime
 
@@ -142,4 +142,10 @@ function drawAxis(scene){
 	geometry.vertices.push(new THREE.Vector3(0, 0, AXIS_EXTREME));
 	var zAxis = new THREE.Line(geometry, lineMaterial);
 	scene.add(zAxis);
+	
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, -AXIS_EXTREME));
+	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
+	var controlLine = new THREE.Line(geometry, lineMaterial);
+	scene.add(controlLine);
 }
