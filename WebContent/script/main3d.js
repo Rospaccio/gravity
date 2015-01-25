@@ -1,3 +1,15 @@
+Constants = {
+		"G" : 6.673E-11,
+		"EARTH_MASS" : 	5.972E+24,
+		"MOON_MASS" : 7.348E+22,
+		"JUPITER_MASS" : 1.8986E+27,
+		"EARTH_MOON_DISTANCE" : 384400000, //384,400 Km
+		"EARTH_MOON_SCREEN_DISTANCE" : 50,
+		"DISTANCE_SCALE_FACTOR" :  undefined
+}
+
+Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EARTH_MOON_SCREEN_DISTANCE;
+
 function threeApp()
 {
 	var scene = new THREE.Scene();
@@ -7,6 +19,7 @@ function threeApp()
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
 	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
 	
+	// Camera controls: they are initialized later
 	var controls;
 	var renderer = new THREE.WebGLRenderer();
 	
@@ -65,17 +78,18 @@ function threeApp()
 	drawAxis(scene);
     //
     
-    moonSphere.position.x = 6;
+    moonSphere.position.x = 25;
     moonSphere.position.y = 0;
     moonSphere.position.z = -4.5;
     
-	camera.position.z = 12;
-	camera.position.x = -2;
+	camera.position.z = 25;
+	camera.position.x = 2;
 	camera.position.y = 4;
-	camera.rotation.x = - Math.PI / 8;
-	camera.rotation.y = - Math.PI / 8;
-	camera.rotation.z = - Math.PI / 24;
+//	camera.rotation.x = - Math.PI / 8;
+//	camera.rotation.y = - Math.PI / 8;
+//	camera.rotation.z = - Math.PI / 24;
 
+	// Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
 	controls = new THREE.TrackballControls( camera );
 	controls.rotateSpeed = 1.0;
 	controls.zoomSpeed = 1.2;
@@ -95,29 +109,11 @@ function threeApp()
 	{	
 		var delta = clock.getDelta();
 		elapsedTime += delta;
-//		cameraControls.update(delta);
 		requestAnimationFrame(render);
-                
-        // -----------------------------------------------------------
-//        var currentZ = camera.position.z += cameraDirection * 0.02;
-//        camera.position.x += cameraDirection * 0.01;
-//        camera.position.y += cameraDirection * 0.01;
-//        console.log("camera.position.z = " + camera.position.z);
-//        if(cameraDirection >= 1 && currentZ > 10)
-//            cameraDirection = -1;
-//        if(cameraDirection <= -1 && currentZ < 5)
-//            cameraDirection = 1;
-//                
-//		cube.rotation.x += 0.005;
-//		cube.rotation.y += 0.005;
-//
-//		parall.rotation.z += 0.004;
-//		parall.rotation.y +=.005;
-		// -----------------------------------------------------------
 		
 		var squareElapsedTime = elapsedTime * elapsedTime
 
-		var moonX = 6 * Math.cos(elapsedTime);
+		var moonX = 25 * Math.cos(elapsedTime);
 		var moonY = Math.sin(elapsedTime * 6);
 		var moonZ = -4.5 * Math.sin(elapsedTime);
 		
@@ -137,7 +133,7 @@ function threeApp()
 
 function drawAxis(scene){
 	
-	var AXIS_EXTREME = 10; 
+	var AXIS_EXTREME = 100; 
 	
 	var geometry = new THREE.Geometry();
 	var lineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000, opacity: 0.9 });
@@ -166,3 +162,78 @@ function drawAxis(scene){
 	var controlLine = new THREE.Line(geometry, lineMaterial);
 	scene.add(controlLine);
 }
+
+function CelestialBody(mass, velocity, mesh){
+	this.mass = mass;
+	this.velocity = velocity;
+	this.acceleration = new THREE.Vector3(0, 0, 0);
+	this.mesh = mesh;
+	
+	this.getPosition = function(){
+		return mesh.position;
+	};
+	
+	this.getVelocity = function(){
+		return this.velocity;
+	};
+	
+	this.squareDistanceFrom = function(body){
+		myPosition = this.getPosition();
+		var squareDistance = body.getPosition().distanceToSquared(myPosition);
+	};
+	
+	this.distanceFrom = function(body){
+		return this.getPosition().distanceTo(body.getPosition());
+	};
+	
+	this.forceBetween = function(body){
+		var squareDistance = this.squareDistanceFrom(body);
+		var force = G * (this.mass * body.mass) / squareDistance;
+		return -1 * force;
+	};
+	
+	this.addForceContribution = function(body){
+		var forceMagnitude = this.forceBetween(body);
+		var distance = this.distanceFrom(body);
+		
+		var xDiff = body.getPosition().x - this.getPosition().x;
+		var yDiff = body.getPosition().y - this.getPosition().y;
+		var zDiff = body.getPosition().z - this.getPosition().z;
+		
+		var xRatio = xDiff / distance;
+		var yRatio = yDiff / distance;
+		var zRatio = zDiff / distance;
+		
+		var fx = forceMagnitude * xRatio;
+		var fy = forceMagnitude * yRatio;
+		var fz = forceMagnitude * zRatio;
+		
+		var forceVector = new THREE.Vector3(fx, fy, fz);
+		
+		this.acceleration = this.acceleration.add( forceVector.divideScalar(this.mass) );
+	};
+	
+	this.updatePosition = function(delta){
+		this.velocity = this.velocity.add(this.acceleration.multiplyScalar(delta));
+		
+		this.mesh.position = this.getPosition().add( this.velocity.multiplyScalar(delta) );
+		
+		this.acceleration = new THREE.Vector3(0, 0, 0);
+	};
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
