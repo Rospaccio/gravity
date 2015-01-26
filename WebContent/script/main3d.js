@@ -15,7 +15,7 @@ Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EART
 function threeApp()
 {
 	var scene = new THREE.Scene();
-	var width = 40;
+	var width = 100;
 	
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
@@ -66,19 +66,24 @@ function threeApp()
 //	parall.position.x = 2;
 //	scene.add(parall);
 
-    var planetGeometry = new THREE.SphereGeometry( .5, 64, 64);
+    var planetGeometry = new THREE.SphereGeometry( .5, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
     planetSphere = new THREE.Mesh( planetGeometry, material );
     planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
     scene.add( planetSphere );
 
-    var moonGeometry = new THREE.SphereGeometry( .5, 64, 64);
+    var moonGeometry = new THREE.SphereGeometry( .5, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
     moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 15, 3), moonSphere);
     scene.add( moonSphere );
     
-    //
+    var secondMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
+    material = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
+    secondMoonSphere = new THREE.Mesh( secondMoonGeometry, material);
+    secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
+    scene.add(secondMoonSphere);
+    
 	drawAxis(scene);
     //
     
@@ -86,9 +91,13 @@ function threeApp()
     moonSphere.position.y = 0;
     moonSphere.position.z = 0;
     
+    secondMoonSphere.position.x = 30;
+    secondMoonSphere.position.y = 0;
+    secondMoonSphere.position.z = -30;
+    
 	camera.position.z = 30;
-	camera.position.x = 2;
-	camera.position.y = 10;
+	camera.position.x = 0; //2;
+	camera.position.y = 0; //10;
 //	camera.rotation.x = - Math.PI / 8;
 //	camera.rotation.y = - Math.PI / 8;
 //	camera.rotation.z = - Math.PI / 24;
@@ -132,8 +141,10 @@ function threeApp()
 		// new: calculates gravitational force
 		moon.addForceContribution(planet);
 		planet.addForceContribution(moon);
+		secondMoon.addForceContribution(planet);
 		
 		moon.updatePosition(delta);
+		secondMoon.updatePosition(delta);
 		planet.updatePosition(delta);
 		
 		controls.update();
