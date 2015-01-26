@@ -96,8 +96,8 @@ function threeApp()
     secondMoonSphere.position.z = -30;
     
 	camera.position.z = 30;
-	camera.position.x = 0; //2;
-	camera.position.y = 0; //10;
+	camera.position.x = 2;
+	camera.position.y = 10;
 //	camera.rotation.x = - Math.PI / 8;
 //	camera.rotation.y = - Math.PI / 8;
 //	camera.rotation.z = - Math.PI / 24;
