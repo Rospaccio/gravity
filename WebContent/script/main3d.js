@@ -7,7 +7,7 @@ Constants = {
 		"EARTH_MOON_SCREEN_DISTANCE" : 50,
 		"DISTANCE_SCALE_FACTOR" :  undefined,
 		
-		"LOG_ENABLED" : true
+		"LOG_ENABLED" : false
 }
 
 Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EARTH_MOON_SCREEN_DISTANCE;
@@ -162,17 +162,18 @@ function drawAxis(scene){
 	var yAxis = new THREE.Line(geometry, lineMaterial);
 	scene.add(yAxis);
 	
+	lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000FF, opacity: 0.9 });
 	geometry = new THREE.Geometry();
 	geometry.vertices.push(new THREE.Vector3(0, 0, -AXIS_EXTREME));
 	geometry.vertices.push(new THREE.Vector3(0, 0, AXIS_EXTREME));
 	var zAxis = new THREE.Line(geometry, lineMaterial);
 	scene.add(zAxis);
 	
-	geometry = new THREE.Geometry();
-	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, -AXIS_EXTREME));
-	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
-	var controlLine = new THREE.Line(geometry, lineMaterial);
-	scene.add(controlLine);
+//	geometry = new THREE.Geometry();
+//	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, -AXIS_EXTREME));
+//	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
+//	var controlLine = new THREE.Line(geometry, lineMaterial);
+//	scene.add(controlLine);
 }
 
 function CelestialBody(mass, velocity, mesh){
