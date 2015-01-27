@@ -10,6 +10,8 @@ Constants = {
 		"LOG_ENABLED" : false
 }
 
+celestialBodies = [];
+
 Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EARTH_MOON_SCREEN_DISTANCE;
 
 function threeApp()
@@ -38,14 +40,15 @@ function threeApp()
 	
 //	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
 	//Ligths
-	var ambientLight = new THREE.AmbientLight( 0x000000 );
+	var ambientLight = new THREE.AmbientLight( 0x111111 );
+	scene.add(ambientLight);
+	
 	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 	light.position.set( 200, 400, 500 );
 
 	var light2 = new THREE.DirectionalLight( 0x00FF00, 1.0 );
 	light2.position.set( -400, 200, -300 );
 
-	scene.add(ambientLight);
 	scene.add(light);
 //	scene.add(light2);
 	//Lights end
@@ -95,6 +98,11 @@ function threeApp()
     secondMoonSphere.position.y = 0;
     secondMoonSphere.position.z = -30;
     
+    // adds bodies to the array that is scanned in game loop (render function)
+    celestialBodies.push(planet);
+    celestialBodies.push(moon);
+    celestialBodies.push(secondMoon);
+    
 	camera.position.z = 30;
 	camera.position.x = 2;
 	camera.position.y = 10;
@@ -139,13 +147,21 @@ function threeApp()
 //		moonSphere.position = new THREE.Vector3(moonX, moonY, moonZ);
 		
 		// new: calculates gravitational force
-		moon.addForceContribution(planet);
-		planet.addForceContribution(moon);
-		secondMoon.addForceContribution(planet);
+		// old style for loop, I know. gonna include jQuery soon...
+		for(var i = 0; i < celestialBodies.length; i++){
+			
+			for(var j = 0; j < celestialBodies.length; j++){
+				if(celestialBodies[i] == celestialBodies[j]){
+					continue;
+				}
+				
+				celestialBodies[i].addForceContribution(celestialBodies[j]);
+			}
+		}
 		
-		moon.updatePosition(delta);
-		secondMoon.updatePosition(delta);
-		planet.updatePosition(delta);
+		for(var i = 0; i < celestialBodies.length; i++){
+			celestialBodies[i].updatePosition();
+		}
 		
 		controls.update();
 		renderer.render(scene, camera);
