@@ -215,17 +215,17 @@ function CelestialBody(mass, velocity, mesh){
 	
 	this.forceBetween = function(body){
 		var squareDistance = this.squareDistanceFrom(body);
-		customLog("mass1 = " + this.mass + "; mass2 = " + body.mass + "; product = " + this.mass * body.mass);
+		//customLog("mass1 = " + this.mass + "; mass2 = " + body.mass + "; product = " + this.mass * body.mass);
 		var force = Constants.G * (this.mass * body.mass) / squareDistance;
-		customLog("force = " + force);
+		//customLog("force = " + force);
 		return force;
 	};
 	
 	this.addForceContribution = function(body){
 		var forceMagnitude = this.forceBetween(body);
-		customLog("forceMagnitude = " + forceMagnitude);
+		//customLog("forceMagnitude = " + forceMagnitude);
 		var distance = this.distanceFrom(body);
-		customLog("distance = " + distance);
+//		customLog("distance = " + distance);
 		var xDiff = body.getPosition().x - this.getPosition().x;
 		var yDiff = body.getPosition().y - this.getPosition().y;
 		var zDiff = body.getPosition().z - this.getPosition().z;
@@ -240,22 +240,22 @@ function CelestialBody(mass, velocity, mesh){
 		
 		var forceVector = new THREE.Vector3(fx, fy, fz);
 		
-		this.acceleration = this.acceleration.add(forceVector.divideScalar(this.mass));
+		this.acceleration.add(forceVector.divideScalar(this.mass));
 	};
 	
 	this.updatePosition = function(delta){
-		// delta = .04; // just to make debugging possible
-		customLog("velocity before update = " + JSON.stringify(this.velocity));
+		delta = .02; // just to make debugging possible
 		this.velocity = this.velocity.add(this.acceleration.multiplyScalar(delta));
-		customLog("velocity after update = " + JSON.stringify(this.velocity));
-		var nextPosition = this.getPosition().add( this.velocity.clone().multiplyScalar(delta) );
+		var tempVelocity = this.velocity.clone();
+		var nextPosition = this.getPosition().clone(); 
+		nextPosition.add( tempVelocity.multiplyScalar(delta) );
 		
 		this.mesh.position.x = nextPosition.x;
 		this.mesh.position.y = nextPosition.y;
 		this.mesh.position.z = nextPosition.z;
 		
 		// customLog("position = " + JSON.stringify( this.mesh.position ));
-		//this.acceleration = new THREE.Vector3(0, 0, 0);
+		this.acceleration = new THREE.Vector3(0, 0, 0);
 		customLog("velocity after acceleration update = " + JSON.stringify(this.velocity));
 	};
 }
