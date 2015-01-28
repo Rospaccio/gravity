@@ -13,10 +13,15 @@ function CelestialBody(mass, velocity, mesh){
 		return mesh.position;
 	};
 	
+        this.getRadius = function(){
+            return .5;
+            //return mesh.radius;
+        };
+        
 	this.getVelocity = function(){
 		return this.velocity;
 	};
-	
+        
 	this.squareDistanceFrom = function(body){
 		myPosition = this.getPosition();
 		//customLog("myPosition = " + myPosition);
@@ -76,4 +81,8 @@ function CelestialBody(mass, velocity, mesh){
 		this.acceleration = new THREE.Vector3(0, 0, 0);
 		// customLog("velocity after acceleration update = " + JSON.stringify(this.velocity));
 	};
+        
+        this.overlaps = function(otherBody){
+          return this.distanceFrom(otherBody) <= this.getRadius() + otherBody.getRadius();
+        };
 }

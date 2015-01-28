@@ -1,47 +1,51 @@
 // Stores all the celestial body added to the simulation
 celestialBodies = [];
 
+// bodies to be added at the beginning of the next simulation step
+// (e. g. in case of a collision)
+newCelestialBodies = [];
+
 function threeApp()
 {
-	var scene = new THREE.Scene();
-	var width = 100;
-	
+    var scene = new THREE.Scene();
+    var width = 100;
+
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
-	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
-	
-	// Camera controls: they are initialized later
-	var controls;
-	var renderer = new THREE.WebGLRenderer();
-	
-	var elapsedTime = 0;
+    var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
+
+    // Camera controls: they are initialized later
+    var controls;
+    var renderer = new THREE.WebGLRenderer();
+
+    var elapsedTime = 0;
     var cameraDirection = 1;
     var direction = 1;
-	
-	var clock = new THREE.Clock();
-	var cameraControls; /*, effectController;*/
-	
-	renderer.gammaInput = true;
-	renderer.gammaOutput = true;
-	renderer.setClearColor( 0xffffff, 1.0 );
-	
+
+    var clock = new THREE.Clock();
+    var cameraControls; /*, effectController;*/
+
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+    renderer.setClearColor(0xffffff, 1.0);
+
 //	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
-	//Ligths
-	var ambientLight = new THREE.AmbientLight( 0x111111 );
-	scene.add(ambientLight);
-	
-	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-	light.position.set( 200, 400, 500 );
+    //Ligths
+    var ambientLight = new THREE.AmbientLight(0x111111);
+    scene.add(ambientLight);
 
-	var light2 = new THREE.DirectionalLight( 0x00FF00, 1.0 );
-	light2.position.set( -400, 200, -300 );
+    var light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+    light.position.set(200, 400, 500);
 
-	scene.add(light);
+    var light2 = new THREE.DirectionalLight(0x00FF00, 1.0);
+    light2.position.set(-400, 200, -300);
+
+    scene.add(light);
 //	scene.add(light2);
-	//Lights end
-	
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement);
+    //Lights end
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
 //	var geometry = new THREE.CubeGeometry(1, 1, 1);
 ////	var material = new THREE.MeshBasicMaterial( {color : 0x00f233} );
@@ -74,8 +78,8 @@ function threeApp()
     secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
     scene.add(secondMoonSphere);
     
-	drawAxes(scene);
-	drawGalaxyBackground(scene);
+    drawAxes(scene);
+    drawGalaxyBackground(scene);
     
     moonSphere.position.x = 20;
     moonSphere.position.y = 0;
@@ -115,52 +119,95 @@ function threeApp()
 	
 	// This function is basically the job of the game loop
 	// this is good enough, for the moment
-	function render()
-	{	
-		var delta = clock.getDelta();
-		elapsedTime += delta;
-		requestAnimationFrame(render);
-		
-		var squareElapsedTime = elapsedTime * elapsedTime
-		
-		// new: calculates gravitational force
-		// old style for loop, I know. gonna include jQuery soon...
-		for(var i = 0; i < celestialBodies.length; i++){
-			if(celestialBodies[i].markedForRemoval){
-				scene.remove(celestialBodies[i]);
-				var removed = celestialBodies.splice(i, 1);
-				customLog("A CelestialBody has been removed: " + removed[0]);
-			}
-		}
-						
-		for(var i = 0; i < celestialBodies.length; i++){
-			
-			for(var j = 0; j < celestialBodies.length; j++){
-				if(celestialBodies[i] == celestialBodies[j]){
-					continue;
-				}
-				
-				celestialBodies[i].addForceContribution(celestialBodies[j]);
-			}
-		}
-		
-		for(var i = 0; i < celestialBodies.length; i++){
-			// not passing delta here: before doing that
-			// a problem, that arises when the browser tab is changed, should be fixed 
-			celestialBodies[i].updatePosition();
-			
-			// check if the body is gone too far: if so, marks it for removal
-			if(celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD){
-				celestialBodies[i].markedForRemoval = true;
-				customLog("A Celestial Body has been marked for removal: " + celestialBodies[i]);
-			}
-		}
-		
-		controls.update();
-		renderer.render(scene, camera);
-	}
+    function render()
+    {
+        var delta = clock.getDelta();
+        elapsedTime += delta;
+        requestAnimationFrame(render);
+
+        // new: calculates gravitational force
+        // old style for loop, I know. gonna include jQuery soon...
+        for (var i = 0; i < celestialBodies.length; i++) {
+            if (celestialBodies[i].markedForRemoval) {
+                scene.remove(celestialBodies[i]);
+                var removed = celestialBodies.splice(i, 1);
+                customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
+            }
+        }
+        
+        for (var i = 0; i < newCelestialBodies.length; i++){
+            scene.add(newCelestialBodies[i].mesh);
+            celestialBodies.push(newCelestialBodies[i]);
+        }
+
+        for (var i = 0; i < celestialBodies.length; i++) {
+            for (var j = 0; j < celestialBodies.length; j++) {
+                if (celestialBodies[i] == celestialBodies[j]) {
+                    continue;
+                }
+
+                celestialBodies[i].addForceContribution(celestialBodies[j]);
+            }
+        }
+
+        for (var i = 0; i < celestialBodies.length; i++) {
+            // not passing delta here: before doing that
+            // a problem, that arises when the browser tab is changed, should be fixed 
+            celestialBodies[i].updatePosition();
+            
+            // check if the body is gone too far: if so, marks it for removal
+            if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
+                celestialBodies[i].markedForRemoval = true;
+                customLog("A Celestial Body has been marked for removal: " + JSON.stringify(celestialBodies[i]));
+            }
+        }
+        
+        for (var i = 0; i < celestialBodies.length; i++) {
+            for (var j = 0; j < celestialBodies.length; j++) {
+                if (celestialBodies[i] == celestialBodies[j]) {
+                    continue;
+                }
+
+                resolveCollision(celestialBodies[i], celestialBodies[j]);
+            }
+        }
+
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
 	
 	render();
+}
+
+function resolveCollision(firstBody, secondBody){
+    // preconditions: checks if the bodies are relly colliding
+    if(!firstBody.overlaps(secondBody)){
+        return;
+    }
+    if (firstBody.markedForRemoval || secondBody.markedForRemoval){
+        return;
+    }
+    
+    firstBody.markedForRemoval = true;
+    secondBody.markedForRemoval = true;
+    
+    var maxRadius = Math.max(firstBody.getRadius(), secondBody.getRadius());
+    var unionGeometry = new THREE.SphereGeometry(maxRadius, 32, 32);
+    var material = new THREE.MeshLambertMaterial({color: 0xFF0000});
+    var unionMesh = new THREE.Mesh(unionGeometry, material);
+    
+    var position = firstBody.getPosition().clone();
+    
+    unionMesh.position.x = position.x;
+    unionMesh.position.y = position.y;
+    unionMesh.position.z = position.z;
+    
+    // TODO: compute the correct velocity
+    var velocity = new THREE.Vector3(0, 0, -1);    
+    var unionBody = new CelestialBody(firstBody.mass + secondBody.mass, velocity, unionMesh);
+    
+    newCelestialBodies.push(unionBody);
 }
 
 function drawAxes(scene){
@@ -198,24 +245,24 @@ function drawAxes(scene){
 
 function drawGalaxyBackground(scene)
 {
-	var addBackgroundStar = function(radius, position){
-		var aStarGeometry = new THREE.SphereGeometry(radius, 16, 16);
-	    var material = new THREE.MeshLambertMaterial( {color: 0xaaaaaa} );
-	    var starMesh = new THREE.Mesh( aStarGeometry, material);
-	    
-	    starMesh.position.x = position.x;
-	    starMesh.position.y = position.y;
-	    starMesh.position.z = position.z;
-	    
-	    scene.add(starMesh);
-	};
-	
-	for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6){
-		var distance = 10000;
-		var radius = 100
-		var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
-		addBackgroundStar(radius, position);
-	}
+    var addBackgroundStar = function(radius, position) {
+        var aStarGeometry = new THREE.SphereGeometry(radius, 16, 16);
+        var material = new THREE.MeshLambertMaterial({color: 0xaaaaaa});
+        var starMesh = new THREE.Mesh(aStarGeometry, material);
+
+        starMesh.position.x = position.x;
+        starMesh.position.y = position.y;
+        starMesh.position.z = position.z;
+
+        scene.add(starMesh);
+    };
+
+    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
+        var distance = 10000;
+        var radius = 100;
+        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
+        addBackgroundStar(radius, position);
+    }
 }
 
 function customLog(message){
