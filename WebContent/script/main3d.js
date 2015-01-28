@@ -8,7 +8,7 @@ function threeApp()
 	
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
-	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
+	var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
 	
 	// Camera controls: they are initialized later
 	var controls;
@@ -75,7 +75,7 @@ function threeApp()
     scene.add(secondMoonSphere);
     
 	drawAxes(scene);
-    //
+	drawGalaxyBackground(scene);
     
     moonSphere.position.x = 20;
     moonSphere.position.y = 0;
@@ -194,6 +194,28 @@ function drawAxes(scene){
 //	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
 //	var controlLine = new THREE.Line(geometry, lineMaterial);
 //	scene.add(controlLine);
+}
+
+function drawGalaxyBackground(scene)
+{
+	var addBackgroundStar = function(radius, position){
+		var aStarGeometry = new THREE.SphereGeometry(radius, 16, 16);
+	    var material = new THREE.MeshLambertMaterial( {color: 0xaaaaaa} );
+	    var starMesh = new THREE.Mesh( aStarGeometry, material);
+	    
+	    starMesh.position.x = position.x;
+	    starMesh.position.y = position.y;
+	    starMesh.position.z = position.z;
+	    
+	    scene.add(starMesh);
+	};
+	
+	for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6){
+		var distance = 10000;
+		var radius = 100
+		var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
+		addBackgroundStar(radius, position);
+	}
 }
 
 function customLog(message){
