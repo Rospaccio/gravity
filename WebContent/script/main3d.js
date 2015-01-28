@@ -1,18 +1,5 @@
-Constants = {
-		"G" : 6.673E-11,
-		"EARTH_MASS" : 10E13, // 	5.972E+24,
-		"MOON_MASS" : 1E2, // 7.348E+22,
-		"JUPITER_MASS" : 1.8986E+27,
-		"EARTH_MOON_DISTANCE" : 384400000, //384,400 Km
-		"EARTH_MOON_SCREEN_DISTANCE" : 50,
-		"DISTANCE_SCALE_FACTOR" :  undefined,
-		
-		"LOG_ENABLED" : false
-}
-
+// Stores all the celestial body added to the simulation
 celestialBodies = [];
-
-Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EARTH_MOON_SCREEN_DISTANCE;
 
 function threeApp()
 {
@@ -87,7 +74,7 @@ function threeApp()
     secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
     scene.add(secondMoonSphere);
     
-	drawAxis(scene);
+	drawAxes(scene);
     //
     
     moonSphere.position.x = 20;
@@ -126,6 +113,8 @@ function threeApp()
 //	console.log("cameraControls.target = " + cameraControls.target);
 //	cameraControls.target.set(0,15,0);
 	
+	// This function is basically the job of the game loop
+	// this is good enough, for the moment
 	function render()
 	{	
 		var delta = clock.getDelta();
@@ -133,21 +122,17 @@ function threeApp()
 		requestAnimationFrame(render);
 		
 		var squareElapsedTime = elapsedTime * elapsedTime
-
-		var moonX = 25 * Math.cos(elapsedTime);
-		var moonY = Math.sin(elapsedTime * 6);
-		var moonZ = -4.5 * Math.sin(elapsedTime);
-		
-//		console.log(moonX + ", " + moonY);
-		
-		// old: a stable periodic motion along an impossible trajectory 
-//		moonSphere.position.x = moonX;
-//		moonSphere.position.y = moonY;
-//		moonSphere.position.z = moonZ;
-//		moonSphere.position = new THREE.Vector3(moonX, moonY, moonZ);
 		
 		// new: calculates gravitational force
 		// old style for loop, I know. gonna include jQuery soon...
+		for(var i = 0; i < celestialBodies.length; i++){
+			if(celestialBodies[i].markedForRemoval){
+				scene.remove(celestialBodies[i]);
+				var removed = celestialBodies.splice(i, 1);
+				customLog("A CelestialBody has been removed: " + removed[0]);
+			}
+		}
+						
 		for(var i = 0; i < celestialBodies.length; i++){
 			
 			for(var j = 0; j < celestialBodies.length; j++){
@@ -160,7 +145,15 @@ function threeApp()
 		}
 		
 		for(var i = 0; i < celestialBodies.length; i++){
+			// not passing delta here: before doing that
+			// a problem, that arises when the browser tab is changed, should be fixed 
 			celestialBodies[i].updatePosition();
+			
+			// check if the body is gone too far: if so, marks it for removal
+			if(celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD){
+				celestialBodies[i].markedForRemoval = true;
+				customLog("A Celestial Body has been marked for removal: " + celestialBodies[i]);
+			}
 		}
 		
 		controls.update();
@@ -170,7 +163,7 @@ function threeApp()
 	render();
 }
 
-function drawAxis(scene){
+function drawAxes(scene){
 	
 	var AXIS_EXTREME = 100; 
 	
@@ -201,79 +194,6 @@ function drawAxis(scene){
 //	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
 //	var controlLine = new THREE.Line(geometry, lineMaterial);
 //	scene.add(controlLine);
-}
-
-function CelestialBody(mass, velocity, mesh){
-	this.mass = mass;
-	this.velocity = velocity;
-	this.acceleration = new THREE.Vector3(0, 0, 0);
-	this.mesh = mesh;
-	
-	this.getPosition = function(){
-		return mesh.position;
-	};
-	
-	this.getVelocity = function(){
-		return this.velocity;
-	};
-	
-	this.squareDistanceFrom = function(body){
-		myPosition = this.getPosition();
-		customLog("myPosition = " + myPosition);
-		var squareDistance = body.getPosition().distanceToSquared(myPosition);
-		customLog("squareDistance = " + squareDistance);
-		return squareDistance;
-	};
-	
-	this.distanceFrom = function(body){
-		return this.getPosition().distanceTo(body.getPosition());
-	};
-	
-	this.forceBetween = function(body){
-		var squareDistance = this.squareDistanceFrom(body);
-		//customLog("mass1 = " + this.mass + "; mass2 = " + body.mass + "; product = " + this.mass * body.mass);
-		var force = Constants.G * (this.mass * body.mass) / squareDistance;
-		//customLog("force = " + force);
-		return force;
-	};
-	
-	this.addForceContribution = function(body){
-		var forceMagnitude = this.forceBetween(body);
-		//customLog("forceMagnitude = " + forceMagnitude);
-		var distance = this.distanceFrom(body);
-//		customLog("distance = " + distance);
-		var xDiff = body.getPosition().x - this.getPosition().x;
-		var yDiff = body.getPosition().y - this.getPosition().y;
-		var zDiff = body.getPosition().z - this.getPosition().z;
-		
-		var xRatio = xDiff / distance;
-		var yRatio = yDiff / distance;
-		var zRatio = zDiff / distance;
-		
-		var fx = forceMagnitude * xRatio;
-		var fy = forceMagnitude * yRatio;
-		var fz = forceMagnitude * zRatio;
-		
-		var forceVector = new THREE.Vector3(fx, fy, fz);
-		
-		this.acceleration.add(forceVector.divideScalar(this.mass));
-	};
-	
-	this.updatePosition = function(delta){
-		delta = .02; // just to make debugging possible
-		this.velocity = this.velocity.add(this.acceleration.multiplyScalar(delta));
-		var tempVelocity = this.velocity.clone();
-		var nextPosition = this.getPosition().clone(); 
-		nextPosition.add( tempVelocity.multiplyScalar(delta) );
-		
-		this.mesh.position.x = nextPosition.x;
-		this.mesh.position.y = nextPosition.y;
-		this.mesh.position.z = nextPosition.z;
-		
-		// customLog("position = " + JSON.stringify( this.mesh.position ));
-		this.acceleration = new THREE.Vector3(0, 0, 0);
-		customLog("velocity after acceleration update = " + JSON.stringify(this.velocity));
-	};
 }
 
 function customLog(message){
