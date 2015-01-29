@@ -60,7 +60,7 @@ function threeApp()
 //	parall.position.x = 2;
 //	scene.add(parall);
 
-    var planetGeometry = new THREE.SphereGeometry( .5, 32, 32);
+    var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
     planetSphere = new THREE.Mesh( planetGeometry, material );
     planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
@@ -131,7 +131,7 @@ function threeApp()
             if (celestialBodies[i].markedForRemoval) {
                 scene.remove(celestialBodies[i]);
                 var removed = celestialBodies.splice(i, 1);
-                customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
+                //customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
             }
         }
         
@@ -139,6 +139,8 @@ function threeApp()
             scene.add(newCelestialBodies[i].mesh);
             celestialBodies.push(newCelestialBodies[i]);
         }
+        // important: empties the new bodies vector
+        newCelestialBodies = [];
 
         for (var i = 0; i < celestialBodies.length; i++) {
             for (var j = 0; j < celestialBodies.length; j++) {
@@ -158,7 +160,7 @@ function threeApp()
             // check if the body is gone too far: if so, marks it for removal
             if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
                 celestialBodies[i].markedForRemoval = true;
-                customLog("A Celestial Body has been marked for removal: " + JSON.stringify(celestialBodies[i]));
+                //customLog("A Celestial Body has been marked for removal: " + JSON.stringify(celestialBodies[i]));
             }
         }
         
@@ -172,12 +174,11 @@ function threeApp()
             }
         }
 
-
         controls.update();
         renderer.render(scene, camera);
     }
-	
-	render();
+    
+    render();
 }
 
 function resolveCollision(firstBody, secondBody){
@@ -188,6 +189,8 @@ function resolveCollision(firstBody, secondBody){
     if (firstBody.markedForRemoval || secondBody.markedForRemoval){
         return;
     }
+    
+    customLog("resolvingCollision");
     
     firstBody.markedForRemoval = true;
     secondBody.markedForRemoval = true;
@@ -205,7 +208,7 @@ function resolveCollision(firstBody, secondBody){
     
     // TODO: compute the correct velocity
     var velocity = new THREE.Vector3(0, 0, -1);    
-    var unionBody = new CelestialBody(firstBody.mass + secondBody.mass, velocity, unionMesh);
+    var unionBody = new CelestialBody(1E14, velocity, unionMesh);
     
     newCelestialBodies.push(unionBody);
 }
