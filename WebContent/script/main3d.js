@@ -207,8 +207,8 @@ function resolveCollision(firstBody, secondBody){
     unionMesh.position.z = position.z;
     
     // TODO: compute the correct velocity
-    var velocity = new THREE.Vector3(0, 0, -1);    
-    var unionBody = new CelestialBody(1E14, velocity, unionMesh);
+    var velocity = new THREE.Vector3(0, 0, 0);    
+    var unionBody = new CelestialBody(firstBody.mass + secondBody.mass, velocity, unionMesh);
     
     newCelestialBodies.push(unionBody);
 }
