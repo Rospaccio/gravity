@@ -69,7 +69,7 @@ function threeApp()
     var moonGeometry = new THREE.SphereGeometry( .5, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
-    moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 15, 3), moonSphere);
+    moon = new CelestialBody(5E12, new THREE.Vector3(0, 15, 3), moonSphere);
     scene.add( moonSphere );
     
     var secondMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
@@ -207,8 +207,14 @@ function resolveCollision(firstBody, secondBody){
     unionMesh.position.z = position.z;
     
     // TODO: compute the correct velocity
-    var velocity = new THREE.Vector3(0, 0, 0);    
-    var unionBody = new CelestialBody(firstBody.mass + secondBody.mass, velocity, unionMesh);
+    
+    // m[vx, vy, vz]+mv2[vx2, vy2, vz2]=M[Vx, Vy, Vz]
+    // [Vx, Vy, Vz] = m1v1 + m2v2 / M
+    var sumMass = firstBody.mass + secondBody.mass;
+    var velocity = (firstBody.velocity.clone().multiplyScalar(firstBody.mass).add( secondBody.velocity.clone().multiplyScalar(secondBody.mass) ))
+    velocity.divideScalar(sumMass);
+    
+    var unionBody = new CelestialBody(sumMass, velocity, unionMesh);
     
     newCelestialBodies.push(unionBody);
 }
