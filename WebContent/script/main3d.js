@@ -69,7 +69,7 @@ function threeApp()
     var moonGeometry = new THREE.SphereGeometry( .5, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
-    moon = new CelestialBody(5E12, new THREE.Vector3(0, 15, 3), moonSphere);
+    moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 15, 3), moonSphere);
     scene.add( moonSphere );
     
     var secondMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
