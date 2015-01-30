@@ -12,7 +12,7 @@ function threeApp()
 
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
-    var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
+    var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 100000);
 
     // Camera controls: they are initialized later
     var controls;
@@ -69,7 +69,7 @@ function threeApp()
     var moonGeometry = new THREE.SphereGeometry( .5, 32, 32);
     material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     moonSphere = new THREE.Mesh( moonGeometry, material );
-    moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 15, 3), moonSphere);
+    moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, -15, 3), moonSphere);
     scene.add( moonSphere );
     
     var secondMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
@@ -77,6 +77,21 @@ function threeApp()
     secondMoonSphere = new THREE.Mesh( secondMoonGeometry, material);
     secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
     scene.add(secondMoonSphere);
+    
+    var additionalBodiesCount = 9;
+    for (var i = 0; i < additionalBodiesCount; i++){
+        var additionalMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
+        var additionalMaterial = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
+        var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
+        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 10 -.1 * i), additionalMoonSphere);
+        
+        additionalMoonSphere.position.x = 50 + i * 4;
+        additionalMoonSphere.position.y = 0 + i * 4;
+        additionalMoonSphere.position.z = 0 + i * 4;
+        
+        scene.add(additionalMoonSphere);
+        celestialBodies.push(additionalMoon);
+    }
     
     drawAxes(scene);
     drawGalaxyBackground(scene);
@@ -94,22 +109,22 @@ function threeApp()
     celestialBodies.push(moon);
     celestialBodies.push(secondMoon);
     
-	camera.position.z = 30;
-	camera.position.x = 2;
-	camera.position.y = 10;
+    camera.position.x = -30;
+    camera.position.y = 30;
+    camera.position.z = 80;
 //	camera.rotation.x = - Math.PI / 8;
 //	camera.rotation.y = - Math.PI / 8;
 //	camera.rotation.z = - Math.PI / 24;
 
-	// Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
-	controls = new THREE.TrackballControls( camera );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3; 
+    // Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
+    controls = new THREE.TrackballControls( camera );
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3; 
 	
 	// this is obsolete code
 //	cameraControls = new THREE.Camera();
@@ -255,7 +270,7 @@ function drawAxes(scene){
 function drawGalaxyBackground(scene)
 {
     var addBackgroundStar = function(radius, position) {
-        var aStarGeometry = new THREE.SphereGeometry(radius, 16, 16);
+        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
         var material = new THREE.MeshLambertMaterial({color: 0xaaaaaa});
         var starMesh = new THREE.Mesh(aStarGeometry, material);
 
@@ -267,8 +282,8 @@ function drawGalaxyBackground(scene)
     };
 
     for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
-        var distance = 10000;
-        var radius = 100;
+        var distance = 50000;
+        var radius = 200;
         var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
         addBackgroundStar(radius, position);
     }
