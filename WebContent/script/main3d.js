@@ -83,7 +83,7 @@ function threeApp()
         var additionalMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
         var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
-        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 10 -.1 * i), additionalMoonSphere);
+        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, -10 +.1 * i), additionalMoonSphere);
         
         additionalMoonSphere.position.x = 50 + i * 4;
         additionalMoonSphere.position.y = 0 + i * 4;
