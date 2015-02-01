@@ -27,7 +27,7 @@ function threeApp()
 
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    renderer.setClearColor(0xffffff, 1.0);
+    renderer.setClearColor(0x212121, 1.0);
 
 //	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
     //Ligths
@@ -78,12 +78,12 @@ function threeApp()
     secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
     scene.add(secondMoonSphere);
     
-    var additionalBodiesCount = 9;
+    var additionalBodiesCount = 16;
     for (var i = 0; i < additionalBodiesCount; i++){
         var additionalMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
         var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
-        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, -10 +.1 * i), additionalMoonSphere);
+        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, -10 + .1 * i), additionalMoonSphere);
         
         additionalMoonSphere.position.x = 50 + i * 4;
         additionalMoonSphere.position.y = 0 + i * 4;
@@ -139,12 +139,11 @@ function threeApp()
         var delta = clock.getDelta();
         elapsedTime += delta;
         requestAnimationFrame(render);
-
-        // new: calculates gravitational force
-        // old style for loop, I know. gonna include jQuery soon...
-        for (var i = 0; i < celestialBodies.length; i++) {
+        var bodiesCount = celestialBodies.length;
+        for (var i = 0; i < bodiesCount; i++) {
             if (celestialBodies[i].markedForRemoval) {
-                scene.remove(celestialBodies[i]);
+                scene.remove(celestialBodies[i].mesh);
+                // THREE.SceneUtils.detach(celestialBodies[i], scene);
                 var removed = celestialBodies.splice(i, 1);
                 //customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
             }
@@ -159,7 +158,7 @@ function threeApp()
 
         for (var i = 0; i < celestialBodies.length; i++) {
             for (var j = 0; j < celestialBodies.length; j++) {
-                if (celestialBodies[i] == celestialBodies[j]) {
+                if (celestialBodies[i] === celestialBodies[j]) {
                     continue;
                 }
 
@@ -181,7 +180,7 @@ function threeApp()
         
         for (var i = 0; i < celestialBodies.length; i++) {
             for (var j = 0; j < celestialBodies.length; j++) {
-                if (celestialBodies[i] == celestialBodies[j]) {
+                if (celestialBodies[i] === celestialBodies[j]) {
                     continue;
                 }
 
@@ -271,7 +270,7 @@ function drawGalaxyBackground(scene)
 {
     var addBackgroundStar = function(radius, position) {
         var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
-        var material = new THREE.MeshLambertMaterial({color: 0xaaaaaa});
+        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
         var starMesh = new THREE.Mesh(aStarGeometry, material);
 
         starMesh.position.x = position.x;
