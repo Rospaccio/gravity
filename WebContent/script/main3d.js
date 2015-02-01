@@ -27,7 +27,7 @@ function threeApp()
 
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    renderer.setClearColor(0xffffff, 1.0);
+    renderer.setClearColor(0x202020, 1.0);
 
 //	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
     //Ligths
@@ -78,16 +78,27 @@ function threeApp()
     secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
     scene.add(secondMoonSphere);
     
-    var additionalBodiesCount = 9;
+    var additionalBodiesCount = 16;
+    var alpha = Math.PI / 12;
     for (var i = 0; i < additionalBodiesCount; i++){
         var additionalMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
         var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
-        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, -10 +.1 * i), additionalMoonSphere);
+        var distance = 30 + i * 4;
         
-        additionalMoonSphere.position.x = 50 + i * 4;
-        additionalMoonSphere.position.y = 0 + i * 4;
-        additionalMoonSphere.position.z = 0 + i * 4;
+        var x  = distance * Math.cos(alpha * i);
+        var y = i;
+        var z = distance * Math.sin(alpha * i);
+        
+        var vConst = 10;
+        var vx = -1 * (vConst) * Math.sin(alpha * i);
+        var vz = (vConst) * Math.cos(alpha * i);
+        
+        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(vx, 0, vz), additionalMoonSphere);
+        
+        additionalMoonSphere.position.x = x;
+        additionalMoonSphere.position.y = y;
+        additionalMoonSphere.position.z = z;
         
         scene.add(additionalMoonSphere);
         celestialBodies.push(additionalMoon);
