@@ -48,10 +48,10 @@ function addSpiralOfBodies(scene){
         var changingColor = 0x115511 + i;
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: changingColor} );
         var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
-        var distance = 30 + i * 2;
+        var distance = 40 + i * 2;
         
         var x  = distance * Math.cos(alpha * i);
-        var y = 0;
+        var y = .5 * i;
         var z = distance * Math.sin(alpha * i);
         
         var vConst = 5;
