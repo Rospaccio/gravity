@@ -27,11 +27,12 @@ function threeApp()
 
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    renderer.setClearColor(0x212121, 1.0);
 
-//	scene.fog = new THREE.Fog( 0x111111, 4, 25 );
+    renderer.setClearColor(0x202020, 1.0);
+
+//    scene.fog = new THREE.Fog( 0x111111, 4, 2500 );
     //Ligths
-    var ambientLight = new THREE.AmbientLight(0x111111);
+    var ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
 
     var light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
@@ -59,55 +60,18 @@ function threeApp()
 //	var parall = new THREE.Mesh(geometry, material);
 //	parall.position.x = 2;
 //	scene.add(parall);
+//    var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
+//    material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
+//    planetSphere = new THREE.Mesh( planetGeometry, material );
+//    planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
+//    scene.add( planetSphere );
 
-    var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
-    material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
-    planetSphere = new THREE.Mesh( planetGeometry, material );
-    planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
-    scene.add( planetSphere );
-
-    var moonGeometry = new THREE.SphereGeometry( .5, 32, 32);
-    material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
-    moonSphere = new THREE.Mesh( moonGeometry, material );
-    moon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, -15, 3), moonSphere);
-    scene.add( moonSphere );
-    
-    var secondMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
-    material = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
-    secondMoonSphere = new THREE.Mesh( secondMoonGeometry, material);
-    secondMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 10, -7), secondMoonSphere);
-    scene.add(secondMoonSphere);
-    
-    var additionalBodiesCount = 16;
-    for (var i = 0; i < additionalBodiesCount; i++){
-        var additionalMoonGeometry = new THREE.SphereGeometry(.5, 32, 32);
-        var additionalMaterial = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
-        var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
-        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, -10 + .1 * i), additionalMoonSphere);
-        
-        additionalMoonSphere.position.x = 50 + i * 4;
-        additionalMoonSphere.position.y = 0 + i * 4;
-        additionalMoonSphere.position.z = 0 + i * 4;
-        
-        scene.add(additionalMoonSphere);
-        celestialBodies.push(additionalMoon);
-    }
+    addOriginMassiveBody(scene);
+    //addSimpleTestBodies(scene);
+    addSpiralOfBodies(scene)
     
     drawAxes(scene);
     drawGalaxyBackground(scene);
-    
-    moonSphere.position.x = 20;
-    moonSphere.position.y = 0;
-    moonSphere.position.z = 0;
-    
-    secondMoonSphere.position.x = 30;
-    secondMoonSphere.position.y = 0;
-    secondMoonSphere.position.z = -30;
-    
-    // adds bodies to the array that is scanned in game loop (render function)
-    celestialBodies.push(planet);
-    celestialBodies.push(moon);
-    celestialBodies.push(secondMoon);
     
     camera.position.x = -30;
     camera.position.y = 30;
@@ -143,7 +107,6 @@ function threeApp()
         for (var i = 0; i < bodiesCount; i++) {
             if (celestialBodies[i].markedForRemoval) {
                 scene.remove(celestialBodies[i].mesh);
-                // THREE.SceneUtils.detach(celestialBodies[i], scene);
                 var removed = celestialBodies.splice(i, 1);
                 //customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
             }
@@ -183,7 +146,6 @@ function threeApp()
                 if (celestialBodies[i] === celestialBodies[j]) {
                     continue;
                 }
-
                 resolveCollision(celestialBodies[i], celestialBodies[j]);
             }
         }
@@ -203,18 +165,29 @@ function resolveCollision(firstBody, secondBody){
     if (firstBody.markedForRemoval || secondBody.markedForRemoval){
         return;
     }
-    
-    customLog("resolvingCollision");
-    
+    // both bodies (and both meshes) will be removed, a new one, resulting from the sum
+    // of the two, will be added to the scene
     firstBody.markedForRemoval = true;
     secondBody.markedForRemoval = true;
+    // the most massive body retains its properties (color, radius, etc...)
+    var prototypeBody;
+    var disappearingBody;
+    if(firstBody.mass >= secondBody.mass){
+        prototypeBody = firstBody;
+        disappearingBody = secondBody;
+    }
+    else{
+        prototypeBody = secondBody;
+        disappearingBody = firstBody;
+    }
+    //customLog("resolvingCollision");
     
     var maxRadius = Math.max(firstBody.getRadius(), secondBody.getRadius());
     var unionGeometry = new THREE.SphereGeometry(maxRadius, 32, 32);
-    var material = new THREE.MeshLambertMaterial({color: 0xFF0000});
+    var material = prototypeBody.mesh.material; // new THREE.MeshLambertMaterial({color: 0xFF0000});
     var unionMesh = new THREE.Mesh(unionGeometry, material);
     
-    var position = firstBody.getPosition().clone();
+    var position = prototypeBody.getPosition().clone();
     
     unionMesh.position.x = position.x;
     unionMesh.position.y = position.y;
