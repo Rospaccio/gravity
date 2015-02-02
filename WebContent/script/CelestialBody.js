@@ -14,8 +14,7 @@ function CelestialBody(mass, velocity, mesh){
 	};
 	
         this.getRadius = function(){
-            return .5;
-            //return mesh.radius;
+            return mesh.geometry.boundingSphere.radius;
         };
         
 	this.getVelocity = function(){
