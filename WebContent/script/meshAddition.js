@@ -58,7 +58,7 @@ function addSpiralOfBodies(scene){
         var additionalMoonGeometry = new THREE.SphereGeometry(1, 32, 32);
         var changingColor = 0x115511 + i;
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: changingColor} );
-        var additionalMoonSphere = new THREE.Mesh( additionalMoonGeometry, additionalMaterial);
+        var additionalMoonSphere = new THREE.Mesh(additionalMoonGeometry, additionalMaterial);
         var distance = 40 + i * 2;
         
         var x  = distance * Math.cos(alpha * i);
@@ -78,4 +78,58 @@ function addSpiralOfBodies(scene){
         scene.add(additionalMoonSphere);
         celestialBodies.push(additionalMoon);
     }
+}
+
+function drawGalaxyBackground(scene)
+{
+    var addBackgroundStar = function(radius, position) {
+        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
+        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
+        var starMesh = new THREE.Mesh(aStarGeometry, material);
+
+        starMesh.position.x = position.x;
+        starMesh.position.y = position.y;
+        starMesh.position.z = position.z;
+
+        scene.add(starMesh);
+    };
+
+    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
+        var distance = 50000;
+        var radius = 200;
+        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
+        addBackgroundStar(radius, position);
+    }
+}
+
+function drawAxes(scene){
+	var AXIS_EXTREME = 100; 
+	
+	var geometry = new THREE.Geometry();
+	var lineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000, opacity: 0.9 });
+	
+	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, 0));
+	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, 0));
+	var xAxis =  new THREE.Line(geometry, lineMaterial);
+	scene.add(xAxis);
+	
+	lineMaterial = new THREE.LineBasicMaterial({ color: 0x00FF00, opacity: 0.9 });
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(0, -AXIS_EXTREME, 0));
+	geometry.vertices.push(new THREE.Vector3(0, AXIS_EXTREME, 0));
+	var yAxis = new THREE.Line(geometry, lineMaterial);
+	scene.add(yAxis);
+	
+	lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000FF, opacity: 0.9 });
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(0, 0, -AXIS_EXTREME));
+	geometry.vertices.push(new THREE.Vector3(0, 0, AXIS_EXTREME));
+	var zAxis = new THREE.Line(geometry, lineMaterial);
+	scene.add(zAxis);
+	
+//	geometry = new THREE.Geometry();
+//	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, -AXIS_EXTREME));
+//	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
+//	var controlLine = new THREE.Line(geometry, lineMaterial);
+//	scene.add(controlLine);
 }

@@ -21,7 +21,7 @@ celestialBodies = [];
 // bodies to be added at the beginning of the next simulation step
 // (e. g. in case of a collision)
 newCelestialBodies = [];
-
+var INTERSECTED;
 function threeApp()
 {
     var scene = new THREE.Scene();
@@ -29,11 +29,11 @@ function threeApp()
 
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
-    var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 100000);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100000);
 
     // Camera controls: they are initialized later
     var controls;
-    var renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer();
 
     var elapsedTime = 0;
     var cameraDirection = 1;
@@ -65,29 +65,11 @@ function threeApp()
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-//	var geometry = new THREE.CubeGeometry(1, 1, 1);
-////	var material = new THREE.MeshBasicMaterial( {color : 0x00f233} );
-//	material = new THREE.MeshLambertMaterial( {color : 0xfff233} );
-//	var cube = new THREE.Mesh(geometry, material);
-//	cube.position.x = -2;
-//	scene.add(cube);
-	
-//	geometry = new THREE.CubeGeometry(1,3,1);
-//	material = new THREE.MeshLambertMaterial({ color : 0xff44ff});
-//	var parall = new THREE.Mesh(geometry, material);
-//	parall.position.x = 2;
-//	scene.add(parall);
-//    var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
-//    material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
-//    planetSphere = new THREE.Mesh( planetGeometry, material );
-//    planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
-//    scene.add( planetSphere );
-
     addOriginMassiveBody(scene);
     //addSimpleTestBodies(scene);
     addSpiralOfBodies(scene)
     
-    drawAxes(scene);
+    //drawAxes(scene);
     drawGalaxyBackground(scene);
     
     camera.position.x = -30;
@@ -107,14 +89,14 @@ function threeApp()
     controls.staticMoving = true;
     controls.dynamicDampingFactor = 0.3; 
 	
-	// this is obsolete code
-//	cameraControls = new THREE.Camera();
-//	cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
-//	console.log("cameraControls.target = " + cameraControls.target);
-//	cameraControls.target.set(0,15,0);
-	
-	// This function is basically the job of the game loop
-	// this is good enough, for the moment
+    // Use of the Raycaster inspired by  webgl_interactive_cubes.html, in the THREE.js project examples directory
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2()
+    document.addEventListener('mousemove', onDocumentMouseMove, false);
+    window.addEventListener('resize', onWindowResize, false);
+    
+    // This function is basically the job of the game loop
+    // this is good enough, for the moment
     function render()
     {
         var delta = clock.getDelta();
@@ -168,6 +150,9 @@ function threeApp()
         }
 
         controls.update();
+        
+        manageRaycasterIntersections(scene, camera);
+        
         renderer.render(scene, camera);
     }
     
@@ -223,69 +208,48 @@ function resolveCollision(firstBody, secondBody){
     newCelestialBodies.push(unionBody);
 }
 
-function drawAxes(scene){
-	
-	var AXIS_EXTREME = 100; 
-	
-	var geometry = new THREE.Geometry();
-	var lineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000, opacity: 0.9 });
-	
-	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, 0));
-	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, 0));
-	var xAxis =  new THREE.Line(geometry, lineMaterial);
-	scene.add(xAxis);
-	
-	lineMaterial = new THREE.LineBasicMaterial({ color: 0x00FF00, opacity: 0.9 });
-	geometry = new THREE.Geometry();
-	geometry.vertices.push(new THREE.Vector3(0, -AXIS_EXTREME, 0));
-	geometry.vertices.push(new THREE.Vector3(0, AXIS_EXTREME, 0));
-	var yAxis = new THREE.Line(geometry, lineMaterial);
-	scene.add(yAxis);
-	
-	lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000FF, opacity: 0.9 });
-	geometry = new THREE.Geometry();
-	geometry.vertices.push(new THREE.Vector3(0, 0, -AXIS_EXTREME));
-	geometry.vertices.push(new THREE.Vector3(0, 0, AXIS_EXTREME));
-	var zAxis = new THREE.Line(geometry, lineMaterial);
-	scene.add(zAxis);
-	
-//	geometry = new THREE.Geometry();
-//	geometry.vertices.push(new THREE.Vector3(-AXIS_EXTREME, 0, -AXIS_EXTREME));
-//	geometry.vertices.push(new THREE.Vector3(AXIS_EXTREME, 0, -AXIS_EXTREME));
-//	var controlLine = new THREE.Line(geometry, lineMaterial);
-//	scene.add(controlLine);
-}
-
-function drawGalaxyBackground(scene)
-{
-    var addBackgroundStar = function(radius, position) {
-        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
-        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
-        var starMesh = new THREE.Mesh(aStarGeometry, material);
-
-        starMesh.position.x = position.x;
-        starMesh.position.y = position.y;
-        starMesh.position.z = position.z;
-
-        scene.add(starMesh);
-    };
-
-    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
-        var distance = 50000;
-        var radius = 200;
-        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
-        addBackgroundStar(radius, position);
-    }
-}
-
 function customLog(message){
 	if(Constants.LOG_ENABLED){
 		console.log(message);
 	}
 } 
 
+function onDocumentMouseMove(event) {
+    event.preventDefault();1
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
 
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
+function manageRaycasterIntersections(scene, camera) {
+    camera.updateMatrixWorld();
+    raycaster.setFromCamera(mouse, camera);
+    var intersects = raycaster.intersectObjects(scene.children);
+
+    if (intersects.length > 0) {
+        if (INTERSECTED !== intersects[0].object) {
+            if (INTERSECTED){
+                INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+            }
+            INTERSECTED = intersects[0].object;
+            //customLog(INTERSECTED);
+           
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+            INTERSECTED.material.emissive.setHex(0xff0000);
+        }
+    } 
+    else {
+        if (INTERSECTED){
+            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+        }
+        INTERSECTED = null;
+    }
+}
 
 
 
