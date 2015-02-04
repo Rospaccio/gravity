@@ -15,6 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+function addCelestialBody(radius, segments, color, mass, velocity, position, scene){
+    var geometry = new THREE.SphereGeometry( radius, segments, segments);
+    var material = new THREE.MeshPhongMaterial( {color: color} );
+    var mesh = new THREE.Mesh( geometry, material );
+    var body = new CelestialBody(mass, velocity, mesh);
+    scene.add( mesh );
+    customLog("position: " + JSON.stringify(position));
+    mesh.position.x = position.x;
+    mesh.position.y = position.y;
+    mesh.position.z = position.z;
+    celestialBodies.push(body);
+}
+
+function addDefaultCelestialBody(velocity, position, scene){
+    if(!scene){
+        customLog("'scene' is not defined, impossible to continue");
+        return;
+    }
+    addCelestialBody(1, 32, 0x00FF00, Constants.MOON_MASS, velocity, position, scene);
+}
+
 function addOriginMassiveBody(scene){
     var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
     var material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
@@ -56,13 +77,13 @@ function addSpiralOfBodies(scene){
     for (var i = 0; i < additionalBodiesCount; i++){
         // var varyingRadius = .1 + .1 * i
         var additionalMoonGeometry = new THREE.SphereGeometry(1, 32, 32);
-        var changingColor = 0x115511 + i;
+        var changingColor = 0x005522 + i;
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: changingColor} );
         var additionalMoonSphere = new THREE.Mesh(additionalMoonGeometry, additionalMaterial);
-        var distance = 40 + i * 2;
+        var distance = 50 + i * 2;
         
         var x  = distance * Math.cos(alpha * i);
-        var y = .2 * i;
+        var y = distance * Math.sin(i + alpha * i * 6);
         var z = distance * Math.sin(alpha * i);
         
         var vConst = 5;

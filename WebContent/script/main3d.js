@@ -24,7 +24,7 @@ newCelestialBodies = [];
 var INTERSECTED;
 function threeApp()
 {
-    var scene = new THREE.Scene();
+    scene = new THREE.Scene();
     var width = 100;
 
 //	var height = width / ( window.innerWidth / window.innerHeight);
@@ -94,6 +94,8 @@ function threeApp()
     mouse = new THREE.Vector2()
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
+    document.addEventListener('mousedown', onMouseDown, false);
+    //document.addEventListener('keypress', onKeyPressed, false);
     
     // This function is basically the job of the game loop
     // this is good enough, for the moment
@@ -251,12 +253,49 @@ function manageRaycasterIntersections(scene, camera) {
     }
 }
 
+function onMouseDown(event){
+    if(event.ctrlKey){
+        addCelestialBody(mouse);
+    }
+}
 
+function onKeyPressed(event){
+//    var chCode = (event.charCode) ? event.charCode : event.keyCode;
+//    customLog("The Unicode character code is: " + chCode);
+    
+    if(event.ctrlKey){
+        customLog("Control pressed");
+    }
+}
 
-
-
-
-
+function onKeyDown(event){
+    // detecting WASD keys
+    /*
+     * W = 119
+     * A = 97
+     * S = 115
+     * D = 100
+     */
+    switch (event.keyCode){
+        case 119:
+            {
+                
+                break;
+            }
+        case 97:
+            {
+                break;
+            }
+        case 115:
+            {
+                break;
+            }
+        case 100:
+            {
+                break;
+            }
+    }
+}
 
 
 
