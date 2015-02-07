@@ -40,7 +40,6 @@ function threeApp()
     var direction = 1;
 
     var clock = new THREE.Clock();
-    var cameraControls; /*, effectController;*/
 
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
@@ -80,22 +79,32 @@ function threeApp()
 //	camera.rotation.z = - Math.PI / 24;
 
     // Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
-    controls = new THREE.TrackballControls( camera );
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.noZoom = false;
-    controls.noPan = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3; 
-	
+    if(Constants.CONTROLS_TYPE == "trackball"){
+        controls = new THREE.TrackballControls( camera );
+        controls.rotateSpeed = 1.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.noZoom = false;
+        controls.noPan = false;
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.3; 
+    }
+    else if(Constants.CONTROLS_TYPE == "fly"){
+        var flyControls = new THREE.FlyControls(camera);
+        flyControls.movementSpeed = 100;
+        flyControls.domElement = renderer.domElement;
+        flyControls.rollSpeed = Math.PI / 12;
+        flyControls.autoForward = false;
+        flyControls.dragToLook = false;
+    }
     // Use of the Raycaster inspired by  webgl_interactive_cubes.html, in the THREE.js project examples directory
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2()
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
     document.addEventListener('mousedown', onMouseDown, false);
-    //document.addEventListener('keypress', onKeyPressed, false);
+//    document.addEventListener('keydown', onKeyDown, false);
+//    document.addEventListener('keyup', onKeyUp, false);
     
     // This function is basically the job of the game loop
     // this is good enough, for the moment
@@ -151,7 +160,15 @@ function threeApp()
             }
         }
 
-        controls.update();
+        if (Constants.CONTROLS_TYPE == "trackball") {
+            controls.update();
+        }
+        else if (Constants.CONTROLS_TYPE == "fly") {
+            flyControls.update(Constants.DEFAULT_TIME_DELTA);
+        }
+        if(camera.shouldMove){
+            updateCameraPosition(camera);
+        }
         
         manageRaycasterIntersections(scene, camera);
         
@@ -259,46 +276,58 @@ function onMouseDown(event){
     }
 }
 
-function onKeyPressed(event){
+function onKeyPressed(event) {
 //    var chCode = (event.charCode) ? event.charCode : event.keyCode;
 //    customLog("The Unicode character code is: " + chCode);
-    
-    if(event.ctrlKey){
+
+    if (event.ctrlKey) {
         customLog("Control pressed");
     }
 }
 
-function onKeyDown(event){
+function onKeyDown(event) {
     // detecting WASD keys
     /*
-     * W = 119
-     * A = 97
-     * S = 115
-     * D = 100
+     * W = 87
+     * A = 65
+     * S = 83
+     * D = 68
      */
-    switch (event.keyCode){
-        case 119:
-            {
-                
-                break;
-            }
-        case 97:
-            {
-                break;
-            }
-        case 115:
-            {
-                break;
-            }
-        case 100:
-            {
-                break;
-            }
+    var keyCode = event.keyCode;
+    if (keyCode === 87 || keyCode === 65 || keyCode === 83 || keyCode === 68) {
+        camera.shouldMove = true;
+        var movement;
+        switch (keyCode) {
+            case 87:
+                {
+                    movement = "forward";
+                    break;
+                }
+            case 65:
+                {
+                    movement = "left"
+                    break;
+                }
+            case 83:
+                {
+                    movement = "back"
+                    break;
+                }
+            case 68:
+                {
+                    movement = "right";
+                    break;
+                }
+        }
+        camera.movementDirection = movement;
     }
 }
 
+function onKeyUp(event){
+    camera.shouldMove = false;
+}
 
-
-
-
-
+function updateCameraPosition(camera, scene){
+    camera.position.z -= Constants.CAMERA_MOVEMENT_STEP;
+    camera.rotation.z += Math.PI / 180;
+}

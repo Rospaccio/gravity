@@ -27,6 +27,9 @@ Constants = {
 		"LOG_ENABLED" : true,
 		"REMOVE_DISTANT_BODIES" : true,
 		"REMOVAL_DISTANCE_THRESHOLD" : 1E4 //1000... is it good? is it bad?
+                ,
+                "CAMERA_MOVEMENT_STEP" : 1,
+                "CONTROLS_TYPE" : "fly"
 }
 
 Constants.DISTANCE_SCALE_FACTOR = Constants.EARTH_MOON_DISTANCE / Constants.EARTH_MOON_SCREEN_DISTANCE;
