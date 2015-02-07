@@ -104,24 +104,40 @@ function addSpiralOfBodies(scene){
 
 function drawGalaxyBackground(scene)
 {
-    var addBackgroundStar = function(radius, position) {
-        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
-        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
-        var starMesh = new THREE.Mesh(aStarGeometry, material);
+    var distance = 50000;
+    // var radius = 200;
+        
+    var geometry = new THREE.Geometry();
 
-        starMesh.position.x = position.x;
-        starMesh.position.y = position.y;
-        starMesh.position.z = position.z;
+    for (var i = 0; i < 10000; i++) {
 
-        scene.add(starMesh);
-    };
+        var vertex = new THREE.Vector3();
+        vertex.x = THREE.Math.randFloatSpread(distance);
+        vertex.y = THREE.Math.randFloatSpread(distance);
+        vertex.z = THREE.Math.randFloatSpread(distance);
 
-    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
-        var distance = 50000;
-        var radius = 200;
-        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
-        addBackgroundStar(radius, position);
+        geometry.vertices.push(vertex);
+
     }
+    var particles = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({color: 0x888888}));
+    scene.add(particles);
+
+//    var addBackgroundStar = function(radius, position) {
+//        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
+//        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
+//        var starMesh = new THREE.Mesh(aStarGeometry, material);
+//
+//        starMesh.position.x = position.x;
+//        starMesh.position.y = position.y;
+//        starMesh.position.z = position.z;
+//
+//        scene.add(starMesh);
+//    };
+//
+//    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
+//        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
+//        addBackgroundStar(radius, position);
+//    }
 }
 
 function drawAxes(scene){
