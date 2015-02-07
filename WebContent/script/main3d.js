@@ -55,11 +55,11 @@ function threeApp()
     var light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
     light.position.set(200, 400, 500);
 
-    var light2 = new THREE.DirectionalLight(0x00FF00, 1.0);
+    var light2 = new THREE.DirectionalLight(0xFFFFFF, .6);
     light2.position.set(-400, 200, -300);
 
     scene.add(light);
-//	scene.add(light2);
+    scene.add(light2);
     //Lights end
 
     renderer.setSize(window.innerWidth, window.innerHeight);

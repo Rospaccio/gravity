@@ -74,10 +74,11 @@ function addSimpleTestBodies(scene){
 function addSpiralOfBodies(scene){
     var additionalBodiesCount = 64;
     var alpha = Math.PI / 12;
+    var changingColor = new THREE.Color(0x337722);
     for (var i = 0; i < additionalBodiesCount; i++){
         // var varyingRadius = .1 + .1 * i
         var additionalMoonGeometry = new THREE.SphereGeometry(1, 32, 32);
-        var changingColor = 0x005522 + i;
+        changingColor.add( new THREE.Color(256 + i));
         var additionalMaterial = new THREE.MeshLambertMaterial( {color: changingColor} );
         var additionalMoonSphere = new THREE.Mesh(additionalMoonGeometry, additionalMaterial);
         var distance = 50 + i * 2;
