@@ -70,6 +70,7 @@ function threeApp()
     
     //drawAxes(scene);
     drawGalaxyBackground(scene);
+    planes = drawHelperPlane(scene);
     
     camera.position.x = -30;
     camera.position.y = 30;
@@ -79,7 +80,7 @@ function threeApp()
 //	camera.rotation.z = - Math.PI / 24;
 
     // Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
-    if(Constants.CONTROLS_TYPE == "trackball"){
+    if(Constants.CONTROLS_TYPE === "trackball"){
         controls = new THREE.TrackballControls( camera );
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
@@ -89,7 +90,7 @@ function threeApp()
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3; 
     }
-    else if(Constants.CONTROLS_TYPE == "fly"){
+    else if(Constants.CONTROLS_TYPE === "fly"){
         var flyControls = new THREE.FlyControls(camera);
         flyControls.movementSpeed = 100;
         flyControls.domElement = renderer.domElement;
@@ -113,14 +114,18 @@ function threeApp()
         var delta = clock.getDelta();
         elapsedTime += delta;
         requestAnimationFrame(render);
+        var nextArray = [];
         var bodiesCount = celestialBodies.length;
         for (var i = 0; i < bodiesCount; i++) {
             if (celestialBodies[i].markedForRemoval) {
                 scene.remove(celestialBodies[i].mesh);
-                var removed = celestialBodies.splice(i, 1);
-                //customLog("A CelestialBody has been removed: " + JSON.stringify(removed[0]));
+            }
+            else{
+                nextArray.push(celestialBodies[i]);
             }
         }
+        
+        celestialBodies = nextArray;
         
         for (var i = 0; i < newCelestialBodies.length; i++){
             scene.add(newCelestialBodies[i].mesh);
@@ -147,7 +152,6 @@ function threeApp()
             // check if the body is gone too far: if so, marks it for removal
             if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
                 celestialBodies[i].markedForRemoval = true;
-                //customLog("A Celestial Body has been marked for removal: " + JSON.stringify(celestialBodies[i]));
             }
         }
         
@@ -160,14 +164,11 @@ function threeApp()
             }
         }
 
-        if (Constants.CONTROLS_TYPE == "trackball") {
+        if (Constants.CONTROLS_TYPE === "trackball") {
             controls.update();
         }
-        else if (Constants.CONTROLS_TYPE == "fly") {
+        else if (Constants.CONTROLS_TYPE === "fly") {
             flyControls.update(Constants.DEFAULT_TIME_DELTA);
-        }
-        if(camera.shouldMove){
-            updateCameraPosition(camera);
         }
         
         manageRaycasterIntersections(scene, camera);
@@ -201,7 +202,6 @@ function resolveCollision(firstBody, secondBody){
         prototypeBody = secondBody;
         disappearingBody = firstBody;
     }
-    //customLog("resolvingCollision");
     
     var maxRadius = Math.max(firstBody.getRadius(), secondBody.getRadius());
     var unionGeometry = new THREE.SphereGeometry(maxRadius, 32, 32);
@@ -234,7 +234,7 @@ function customLog(message){
 } 
 
 function onDocumentMouseMove(event) {
-    event.preventDefault();1
+    event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
@@ -251,34 +251,55 @@ function manageRaycasterIntersections(scene, camera) {
     var intersects = raycaster.intersectObjects(scene.children);
 
     if (intersects.length > 0) {
-        if (INTERSECTED !== intersects[0].object) {
-            if (INTERSECTED){
-                INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-            }
-            INTERSECTED = intersects[0].object;
-            //customLog(INTERSECTED);
-           
-            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-            INTERSECTED.material.emissive.setHex(0xff0000);
-        }
+//        if (INTERSECTED !== intersects[0].object) {
+//            if (INTERSECTED){
+//                /INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+//            }
+//            INTERSECTED = intersects[0].object;
+//            //customLog(INTERSECTED);
+//           
+//            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+//            INTERSECTED.material.emissive.setHex(0xff0000);
+//        }
     } 
     else {
-        if (INTERSECTED){
-            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-        }
-        INTERSECTED = null;
+//        if (INTERSECTED){
+//            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+//        }
+//        INTERSECTED = null;
     }
 }
 
 function onMouseDown(event){
     if(event.ctrlKey){
-        addCelestialBody(mouse);
+        //customLog("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
+        /*
+            distance – distance between the origin of the ray and the intersection
+            point – point of intersection, in world coordinates
+            face – intersected face
+            faceIndex – index of the intersected face
+            indices – indices of vertices comprising the intersected face
+            object – the intersected object
+         */
+        var intersections = raycaster.intersectObjects(planes, false);
+        if(intersections.length > 0){
+            planeIntersection = intersections[0];
+            
+            var cameraPosition = camera.position.clone();
+            var intersectionPoint = planeIntersection.point.clone();
+            
+            var velocityVersor = intersectionPoint.sub(cameraPosition).normalize();
+            var velocityMagnitude = 20;
+            var velocity = velocityVersor.multiplyScalar(velocityMagnitude);
+            
+            addDefaultCelestialBody(velocity, planeIntersection.point, scene);
+            
+        }
     }
 }
 
 function onKeyPressed(event) {
 //    var chCode = (event.charCode) ? event.charCode : event.keyCode;
-//    customLog("The Unicode character code is: " + chCode);
 
     if (event.ctrlKey) {
         customLog("Control pressed");
@@ -294,40 +315,8 @@ function onKeyDown(event) {
      * D = 68
      */
     var keyCode = event.keyCode;
-    if (keyCode === 87 || keyCode === 65 || keyCode === 83 || keyCode === 68) {
-        camera.shouldMove = true;
-        var movement;
-        switch (keyCode) {
-            case 87:
-                {
-                    movement = "forward";
-                    break;
-                }
-            case 65:
-                {
-                    movement = "left"
-                    break;
-                }
-            case 83:
-                {
-                    movement = "back"
-                    break;
-                }
-            case 68:
-                {
-                    movement = "right";
-                    break;
-                }
-        }
-        camera.movementDirection = movement;
-    }
 }
 
 function onKeyUp(event){
-    camera.shouldMove = false;
-}
-
-function updateCameraPosition(camera, scene){
-    camera.position.z -= Constants.CAMERA_MOVEMENT_STEP;
-    camera.rotation.z += Math.PI / 180;
+    
 }

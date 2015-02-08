@@ -102,6 +102,28 @@ function addSpiralOfBodies(scene){
     }
 }
 
+function drawHelperPlane(scene) {
+    // two planes are necessary to intercepts intersection both from
+    // the upper and the lower side.
+    var geometry = new THREE.PlaneBufferGeometry(50000, 50000);
+    // the plane is equal to the y-z axes plane: need to be rotated 90 degrees
+    // in order to match with the x-z plane. Thus we obtain a plane that face the up direction
+    geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+    var plane = new THREE.Mesh(geometry);
+    plane.visible = false;
+    
+    var upsideDownPlaneGeometry = geometry.clone();
+    // Similar to the previuos case, except that now we must rotate 180 degrees because
+    // we need a plane that face the down direction
+    upsideDownPlaneGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI));
+    var upsideDownPlane = new THREE.Mesh(upsideDownPlaneGeometry);
+    upsideDownPlane.visible = false;
+    
+    scene.add(plane);
+    scene.add(upsideDownPlane);
+    return [plane, upsideDownPlane];
+}
+
 function drawGalaxyBackground(scene)
 {
     var distance = 50000;
