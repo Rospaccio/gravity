@@ -21,25 +21,37 @@ celestialBodies = [];
 // bodies to be added at the beginning of the next simulation step
 // (e. g. in case of a collision)
 newCelestialBodies = [];
+
 var INTERSECTED;
-function threeApp()
+var elapsedTime = 0;
+// Camera controls: they are initialized later
+var controls;
+var simulationRunning = true;
+
+function threeApp(elementContainerId)
 {
+    initTreeApp(elementContainerId);
+    animate();
+}
+
+function start(){
+    simulationRunning = true;
+}
+
+function pause(){
+    simulationRunning = false;
+}
+
+function initTreeApp(elementContainerId){
     scene = new THREE.Scene();
-    var width = 100;
 
 //	var height = width / ( window.innerWidth / window.innerHeight);
 //	var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 ); 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100000);
 
-    // Camera controls: they are initialized later
-    var controls;
     renderer = new THREE.WebGLRenderer();
 
-    var elapsedTime = 0;
-    var cameraDirection = 1;
-    var direction = 1;
-
-    var clock = new THREE.Clock();
+    clock = new THREE.Clock();
 
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
@@ -62,7 +74,7 @@ function threeApp()
     //Lights end
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    document.getElementById(elementContainerId).appendChild(renderer.domElement);
 
     addOriginMassiveBody(scene);
     //addSimpleTestBodies(scene);
@@ -81,14 +93,16 @@ function threeApp()
 
     // Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
     if(Constants.CONTROLS_TYPE === "trackball"){
-        controls = new THREE.TrackballControls( camera );
-        controls.rotateSpeed = 1.0;
-        controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
-        controls.noZoom = false;
-        controls.noPan = false;
-        controls.staticMoving = true;
-        controls.dynamicDampingFactor = 0.3; 
+        var trackBallControls = new THREE.TrackballControls( camera );
+        trackBallControls.rotateSpeed = 1.0;
+        trackBallControls.zoomSpeed = 1.2;
+        trackBallControls.panSpeed = 0.8;
+        trackBallControls.noZoom = false;
+        trackBallControls.noPan = false;
+        trackBallControls.staticMoving = true;
+        trackBallControls.dynamicDampingFactor = 0.3; 
+        
+        controls = trackBallControls;
     }
     else if(Constants.CONTROLS_TYPE === "fly"){
         var flyControls = new THREE.FlyControls(camera);
@@ -97,6 +111,8 @@ function threeApp()
         flyControls.rollSpeed = Math.PI / 12;
         flyControls.autoForward = false;
         flyControls.dragToLook = false;
+        
+        controls = flyControls;
     }
     // Use of the Raycaster inspired by  webgl_interactive_cubes.html, in the THREE.js project examples directory
     raycaster = new THREE.Raycaster();
@@ -106,77 +122,82 @@ function threeApp()
     document.addEventListener('mousedown', onMouseDown, false);
 //    document.addEventListener('keydown', onKeyDown, false);
 //    document.addEventListener('keyup', onKeyUp, false);
-    
-    // This function is basically the job of the game loop
-    // this is good enough, for the moment
-    function render()
-    {
-        var delta = clock.getDelta();
-        elapsedTime += delta;
-        requestAnimationFrame(render);
-        var nextArray = [];
-        var bodiesCount = celestialBodies.length;
-        for (var i = 0; i < bodiesCount; i++) {
-            if (celestialBodies[i].markedForRemoval) {
-                scene.remove(celestialBodies[i].mesh);
-            }
-            else{
-                nextArray.push(celestialBodies[i]);
-            }
-        }
-        
-        celestialBodies = nextArray;
-        
-        for (var i = 0; i < newCelestialBodies.length; i++){
-            scene.add(newCelestialBodies[i].mesh);
-            celestialBodies.push(newCelestialBodies[i]);
-        }
-        // important: empties the new bodies vector
-        newCelestialBodies = [];
+}
 
-        for (var i = 0; i < celestialBodies.length; i++) {
-            for (var j = 0; j < celestialBodies.length; j++) {
-                if (celestialBodies[i] === celestialBodies[j]) {
-                    continue;
-                }
-
-                celestialBodies[i].addForceContribution(celestialBodies[j]);
-            }
-        }
-
-        for (var i = 0; i < celestialBodies.length; i++) {
-            // not passing delta here: before doing that
-            // a problem, that arises when the browser tab is changed, should be fixed 
-            celestialBodies[i].updatePosition();
-            
-            // check if the body is gone too far: if so, marks it for removal
-            if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
-                celestialBodies[i].markedForRemoval = true;
-            }
-        }
-        
-        for (var i = 0; i < celestialBodies.length; i++) {
-            for (var j = 0; j < celestialBodies.length; j++) {
-                if (celestialBodies[i] === celestialBodies[j]) {
-                    continue;
-                }
-                resolveCollision(celestialBodies[i], celestialBodies[j]);
-            }
-        }
-
-        if (Constants.CONTROLS_TYPE === "trackball") {
-            controls.update();
-        }
-        else if (Constants.CONTROLS_TYPE === "fly") {
-            flyControls.update(Constants.DEFAULT_TIME_DELTA);
-        }
-        
-        manageRaycasterIntersections(scene, camera);
-        
-        renderer.render(scene, camera);
+// This function is basically the job of the game loop
+// this is good enough, for the moment
+function animate()
+{
+    var delta = clock.getDelta();
+    elapsedTime += delta;
+    requestAnimationFrame(animate);
+    if(simulationRunning){
+        updateObjects(delta);
     }
-    
     render();
+}
+
+function updateObjects(delta){
+       var nextArray = [];
+    var bodiesCount = celestialBodies.length;
+    for (var i = 0; i < bodiesCount; i++) {
+        if (celestialBodies[i].markedForRemoval) {
+            scene.remove(celestialBodies[i].mesh);
+        }
+        else {
+            nextArray.push(celestialBodies[i]);
+        }
+    }
+
+    celestialBodies = nextArray;
+
+    for (var i = 0; i < newCelestialBodies.length; i++) {
+        scene.add(newCelestialBodies[i].mesh);
+        celestialBodies.push(newCelestialBodies[i]);
+    }
+    // important: empties the new bodies vector
+    newCelestialBodies = [];
+
+    for (var i = 0; i < celestialBodies.length; i++) {
+        for (var j = 0; j < celestialBodies.length; j++) {
+            if (celestialBodies[i] === celestialBodies[j]) {
+                continue;
+            }
+
+            celestialBodies[i].addForceContribution(celestialBodies[j]);
+        }
+    }
+
+    for (var i = 0; i < celestialBodies.length; i++) {
+        // not passing delta here: before doing that
+        // a problem, that arises when the browser tab is changed, should be fixed 
+        celestialBodies[i].updatePosition();
+
+        // check if the body is gone too far: if so, marks it for removal
+        if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
+            celestialBodies[i].markedForRemoval = true;
+        }
+    }
+
+    for (var i = 0; i < celestialBodies.length; i++) {
+        for (var j = 0; j < celestialBodies.length; j++) {
+            if (celestialBodies[i] === celestialBodies[j]) {
+                continue;
+            }
+            resolveCollision(celestialBodies[i], celestialBodies[j]);
+        }
+    }
+}
+
+function render(){
+    if (Constants.CONTROLS_TYPE === "trackball") {
+        controls.update();
+    }
+    else if (Constants.CONTROLS_TYPE === "fly") {
+        controls.update(Constants.DEFAULT_TIME_DELTA);
+    }
+    manageRaycasterIntersections(scene, camera);
+    renderer.render(scene, camera);
 }
 
 function resolveCollision(firstBody, secondBody){
@@ -319,4 +340,10 @@ function onKeyDown(event) {
 
 function onKeyUp(event){
     
+}
+
+function toggleHelperPlanesVisibility(){
+    for(var i = 0; i < planes.length; i++){
+        planes[i].visible = !planes[i].visible;
+    }
 }

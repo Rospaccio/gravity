@@ -26,6 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				margin: 0px;
 				overflow: hidden;
 			}
+                        #menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+				padding: 0;
+				margin: 0;
+			}
 		</style>
 		<script type="text/javascript" src="../lib/three.js"></script>
 		<script type="text/javascript" src="../lib/TrackballControls.js"></script>
@@ -37,11 +45,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		
 		<title>3D Gravity Sandbox</title>
 	</head>
-	<body>
-	
-		<script type="text/javascript">
-			threeApp();
-		</script>
-	
-	</body>
+        <body>
+            <div id="container">
+                
+            </div>
+            <div id="menu">
+                <input type="button" id="startPauseButton" value="pause" onclick="toggleSimulationRunningState(this)"/>
+                <input type="button" id="helperPlanesButton" value="helper planes" onclick="toggleHelperPlanesVisibility()" />
+            </div>
+            <script type="text/javascript">
+                    threeApp('container');
+                    function toggleSimulationRunningState(button){
+                        if(simulationRunning){
+                            pause();
+                            button.value = "start";
+                        }
+                        else{
+                            start();
+                            button.value = "pause";
+                        }
+                    }
+            </script>
+        </body>
 </html>
