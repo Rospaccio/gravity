@@ -26,6 +26,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				margin: 0px;
 				overflow: hidden;
 			}
+                        #info{
+                            position: absolute;
+				top: 5px;
+				width: 100%;
+				text-align: center;
+                                color: aqua;
+				padding: 0;
+				margin: 0;
+                        }
                         #menu {
 				position: absolute;
 				bottom: 20px;
@@ -49,9 +58,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div id="container">
                 
             </div>
+            <div id="info">
+                <p>Use the mouse to control the view. Control + click to add new planets (they spawn at the intersection between the mouse pointer and the helper planes)</p>
+            </div>
             <div id="menu">
                 <input type="button" id="startPauseButton" value="pause" onclick="toggleSimulationRunningState(this)"/>
                 <input type="button" id="helperPlanesButton" value="helper planes" onclick="toggleHelperPlanesVisibility()" />
+                <input type="button" id="addMode" value="add mode" onclick="toggleAddMode(this)"/>
             </div>
             <script type="text/javascript">
                     threeApp('container');
@@ -63,6 +76,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         else{
                             start();
                             button.value = "pause";
+                        }
+                    }
+                    function toggleAddMode(button){
+                        addMode = !addMode;
+                        if(addMode){
+                            button.value = "control mode";
+                        }
+                        else{
+                            button.value = "add mode";
                         }
                     }
             </script>

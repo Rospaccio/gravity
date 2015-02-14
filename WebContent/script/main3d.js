@@ -27,6 +27,7 @@ var elapsedTime = 0;
 // Camera controls: they are initialized later
 var controls;
 var simulationRunning = true;
+var addMode = false;
 
 function threeApp(elementContainerId)
 {
@@ -292,7 +293,7 @@ function manageRaycasterIntersections(scene, camera) {
 }
 
 function onMouseDown(event){
-    if(event.ctrlKey){
+    if(event.ctrlKey || addMode){
         //customLog("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
         /*
             distance – distance between the origin of the ray and the intersection
@@ -314,7 +315,7 @@ function onMouseDown(event){
             var velocity = velocityVersor.multiplyScalar(velocityMagnitude);
             
             addDefaultCelestialBody(velocity, planeIntersection.point, scene);
-            
+//            addCelestialBody(1, 32, 0x00FF00, Constants.MOON_MASS * 10, velocity, planeIntersection.point, scene);
         }
     }
 }
