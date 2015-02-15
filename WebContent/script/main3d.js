@@ -25,7 +25,8 @@ newCelestialBodies = [];
 var INTERSECTED;
 var elapsedTime = 0;
 // Camera controls: they are initialized later
-var controls;
+var allAvailableControls = {};
+var currentControls;
 var simulationRunning = true;
 var addMode = false;
 
@@ -93,27 +94,30 @@ function initTreeApp(elementContainerId){
 //	camera.rotation.z = - Math.PI / 24;
 
     // Camera controls initialization: the settings are taken from one of the THREE.js examples (webgl_interactive_draggable.html)
+    var trackBallControls = new THREE.TrackballControls(camera);
+    trackBallControls.rotateSpeed = 1.0;
+    trackBallControls.zoomSpeed = 1.2;
+    trackBallControls.panSpeed = 0.8;
+    trackBallControls.noZoom = false;
+    trackBallControls.noPan = false;
+    trackBallControls.staticMoving = true;
+    trackBallControls.dynamicDampingFactor = 0.3;
+
+    var flyControls = new THREE.FlyControls(camera);
+    flyControls.movementSpeed = 100;
+    flyControls.domElement = renderer.domElement;
+    flyControls.rollSpeed = Math.PI / 12;
+    flyControls.autoForward = false;
+    flyControls.dragToLook = true;
+    
+    allAvailableControls["trackball"] = trackBallControls;
+    allAvailableControls["fly"] = flyControls;
+    
     if(Constants.CONTROLS_TYPE === "trackball"){
-        var trackBallControls = new THREE.TrackballControls( camera );
-        trackBallControls.rotateSpeed = 1.0;
-        trackBallControls.zoomSpeed = 1.2;
-        trackBallControls.panSpeed = 0.8;
-        trackBallControls.noZoom = false;
-        trackBallControls.noPan = false;
-        trackBallControls.staticMoving = true;
-        trackBallControls.dynamicDampingFactor = 0.3; 
-        
-        controls = trackBallControls;
+        currentControls = trackBallControls;
     }
     else if(Constants.CONTROLS_TYPE === "fly"){
-        var flyControls = new THREE.FlyControls(camera);
-        flyControls.movementSpeed = 100;
-        flyControls.domElement = renderer.domElement;
-        flyControls.rollSpeed = Math.PI / 12;
-        flyControls.autoForward = false;
-        flyControls.dragToLook = false;
-        
-        controls = flyControls;
+        currentControls = flyControls;
     }
     // Use of the Raycaster inspired by  webgl_interactive_cubes.html, in the THREE.js project examples directory
     raycaster = new THREE.Raycaster();
@@ -191,12 +195,8 @@ function updateObjects(delta){
 }
 
 function render(){
-    if (Constants.CONTROLS_TYPE === "trackball") {
-        controls.update();
-    }
-    else if (Constants.CONTROLS_TYPE === "fly") {
-        controls.update(Constants.DEFAULT_TIME_DELTA);
-    }
+    currentControls.update(Constants.DEFAULT_TIME_DELTA);
+        
     manageRaycasterIntersections(scene, camera);
     renderer.render(scene, camera);
 }

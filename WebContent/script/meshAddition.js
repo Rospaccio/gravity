@@ -21,7 +21,7 @@ function addCelestialBody(radius, segments, color, mass, velocity, position, sce
     var mesh = new THREE.Mesh( geometry, material );
     var body = new CelestialBody(mass, velocity, mesh);
     scene.add( mesh );
-    customLog("position: " + JSON.stringify(position));
+//    customLog("position: " + JSON.stringify(position));
     mesh.position.x = position.x;
     mesh.position.y = position.y;
     mesh.position.z = position.z;

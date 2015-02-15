@@ -64,7 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div id="menu">
                 <input type="button" id="startPauseButton" value="pause" onclick="toggleSimulationRunningState(this)"/>
                 <input type="button" id="helperPlanesButton" value="helper planes" onclick="toggleHelperPlanesVisibility()" />
-                <input type="button" id="addMode" value="add mode" onclick="toggleAddMode(this)"/>
+                <input type="button" id="addMode" value="add mode" onclick="toggleAddMode(this)" />
+                <input type="button" id="controls" value="fly" onclick="toggleControlMode(this)" />
             </div>
             <script type="text/javascript">
                     threeApp('container');
@@ -85,6 +86,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         }
                         else{
                             button.value = "add mode";
+                        }
+                    }
+                    function toggleControlMode(button){
+                        if(currentControls === allAvailableControls["fly"])
+                        {
+                            currentControls = allAvailableControls["trackball"];
+                            button.value = "fly mode";
+                        }
+                        else
+                        {
+                            currentControls = allAvailableControls["fly"];
+                            button.value = "trackball mode";
                         }
                     }
             </script>

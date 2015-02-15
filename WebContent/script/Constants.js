@@ -26,7 +26,7 @@ Constants = {
 		"DEFAULT_TIME_DELTA" : .02,
 		"LOG_ENABLED" : true,
 		"REMOVE_DISTANT_BODIES" : true,
-		"REMOVAL_DISTANCE_THRESHOLD" : 1E4 //1000... is it good? is it bad?
+		"REMOVAL_DISTANCE_THRESHOLD" : 1E4
                 ,
                 "CAMERA_MOVEMENT_STEP" : 1,
                 "CONTROLS_TYPE" : "trackball"
