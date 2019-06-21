@@ -82,11 +82,24 @@ function CelestialBody(mass, velocity, mesh){
 		if(!delta){
 			delta = Constants.DEFAULT_TIME_DELTA; // just to make debugging possible
 		}
-		this.velocity = this.velocity.add(this.acceleration.multiplyScalar(delta));
+
+		/* *
+		this.velocity.add(this.acceleration.multiplyScalar(delta));
 		var tempVelocity = this.velocity.clone();
-		var nextPosition = this.getPosition().clone(); 
+		var nextPosition = this.getPosition().clone();
 		nextPosition.add( tempVelocity.multiplyScalar(delta) );
-		
+		/* */
+
+		/* */
+		this.velocity.add(this.acceleration.multiplyScalar(delta));
+		var nextPosition = this.getPosition().clone();
+		var tempAcceleration = this.acceleration.clone();
+		var tempVelocity = this.velocity.clone();
+		nextPosition.add( tempAcceleration.multiplyScalar(delta).multiplyScalar(.5) );
+		nextPosition.add( tempVelocity.multiplyScalar(delta));
+		/* */
+
+
 		this.mesh.position.x = nextPosition.x;
 		this.mesh.position.y = nextPosition.y;
 		this.mesh.position.z = nextPosition.z;
