@@ -87,7 +87,7 @@ function addSpiralOfBodies(scene){
         var y = distance * Math.sin(i + alpha * i * 6);
         var z = distance * Math.sin(alpha * i);
         
-        var vConst = 5;
+        var vConst = 7;
         var vx = -1 * (vConst) * Math.sin(alpha * i);
         var vz = (vConst) * Math.cos(alpha * i);
         
