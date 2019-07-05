@@ -30,6 +30,9 @@ var currentControls;
 var simulationRunning = true;
 var addMode = false;
 
+var scene;
+var trajectoriesMaterial;
+
 function threeApp(elementContainerId)
 {
     initTreeApp(elementContainerId);
@@ -125,8 +128,17 @@ function initTreeApp(elementContainerId){
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
     document.addEventListener('mousedown', onMouseDown, false);
-//    document.addEventListener('keydown', onKeyDown, false);
-//    document.addEventListener('keyup', onKeyUp, false);
+}
+
+// POC: trajectories
+function addTrajectorySegment(startPoint, endPoint){
+
+    trajectoriesMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
+    var lineGeometry = new THREE.Geometry();
+    lineGeometry.vertices.push(startPoint);
+    lineGeometry.vertices.push(endPoint);
+    var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
+    scene.add(trajectoryLine);
 }
 
 // This function is basically the job of the game loop
@@ -175,8 +187,11 @@ function updateObjects(delta){
 
     for (var i = 0; i < celestialBodies.length; i++) {
         // not passing delta here: before doing that
-        // a problem, that arises when the browser tab is changed, should be fixed 
+        // a problem, that arises when the browser tab is changed, should be fixed
+        var previousPosition = celestialBodies[i].getPosition().clone();
         celestialBodies[i].updatePosition();
+        var newPosition = celestialBodies[i].getPosition().clone();
+        addTrajectorySegment(previousPosition, newPosition);
 
         // check if the body is gone too far: if so, marks it for removal
         if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
@@ -268,28 +283,10 @@ function onWindowResize() {
 }
 
 function manageRaycasterIntersections(scene, camera) {
+
     camera.updateMatrixWorld();
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObjects(scene.children);
-
-    if (intersects.length > 0) {
-//        if (INTERSECTED !== intersects[0].object) {
-//            if (INTERSECTED){
-//                /INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-//            }
-//            INTERSECTED = intersects[0].object;
-//            //customLog(INTERSECTED);
-//           
-//            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-//            INTERSECTED.material.emissive.setHex(0xff0000);
-//        }
-    } 
-    else {
-//        if (INTERSECTED){
-//            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-//        }
-//        INTERSECTED = null;
-    }
 }
 
 function onMouseDown(event){

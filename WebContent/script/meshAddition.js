@@ -72,7 +72,7 @@ function addSimpleTestBodies(scene){
 }
 
 function addSpiralOfBodies(scene){
-    var additionalBodiesCount = 64;
+    var additionalBodiesCount = 5;
     var alpha = Math.PI / 12;
     var changingColor = new THREE.Color(0x337722);
     for (var i = 0; i < additionalBodiesCount; i++){
@@ -143,23 +143,6 @@ function drawGalaxyBackground(scene)
     }
     var particles = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({color: 0x888888}));
     scene.add(particles);
-
-//    var addBackgroundStar = function(radius, position) {
-//        var aStarGeometry = new THREE.SphereGeometry(radius, 8, 8);
-//        var material = new THREE.MeshLambertMaterial({color: 0xffffff});
-//        var starMesh = new THREE.Mesh(aStarGeometry, material);
-//
-//        starMesh.position.x = position.x;
-//        starMesh.position.y = position.y;
-//        starMesh.position.z = position.z;
-//
-//        scene.add(starMesh);
-//    };
-//
-//    for (var i = 0; i < 2 * Math.PI; i = i + Math.PI / 6) {
-//        var position = new THREE.Vector3(distance * Math.cos(i), 0, distance * Math.sin(i));
-//        addBackgroundStar(radius, position);
-//    }
 }
 
 function drawAxes(scene){
