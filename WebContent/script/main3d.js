@@ -128,17 +128,24 @@ function initTreeApp(elementContainerId){
     document.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
     document.addEventListener('mousedown', onMouseDown, false);
+
+    trajectoriesMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
 }
 
 // POC: trajectories
-function addTrajectorySegment(startPoint, endPoint){
+function addTrajectorySegment(object, startPoint, endPoint){
 
-    trajectoriesMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
+    if(!object.trajectory){
+        object.trajectory = new THREE.Group();
+        scene.add(object.trajectory);
+    }
+
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices.push(startPoint);
     lineGeometry.vertices.push(endPoint);
     var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
-    scene.add(trajectoryLine);
+    object.trajectory.add(trajectoryLine);
+    // scene.add(trajectoryLine);
 }
 
 // This function is basically the job of the game loop
@@ -191,7 +198,7 @@ function updateObjects(delta){
         var previousPosition = celestialBodies[i].getPosition().clone();
         celestialBodies[i].updatePosition();
         var newPosition = celestialBodies[i].getPosition().clone();
-        addTrajectorySegment(previousPosition, newPosition);
+        addTrajectorySegment(celestialBodies[i], previousPosition, newPosition);
 
         // check if the body is gone too far: if so, marks it for removal
         if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
