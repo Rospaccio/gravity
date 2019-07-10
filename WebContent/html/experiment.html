@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experimental page</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+            #info{
+                position: absolute;
+				top: 5px;
+				width: 100%;
+				text-align: center;
+                color: aqua;
+				padding: 0;
+				margin: 0;
+            }
+            #menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+				padding: 0;
+				margin: 0;
+			}
+
+    </style>
+    <script type="text/javascript" src="../lib/three.js"></script>
+    <script type="text/javascript" src="../lib/TrackballControls.js"></script>
+    <script type="text/javascript" src="../lib/FlyControls.js"></script>
+    <script type="text/javascript" src="../script/experiment.js"></script>
+</head>
+<body>
+    <div id="container">
+
+    </div>
+    <script>
+        Experiment.setupScene_02();
+    </script>
+</body>
+</html>

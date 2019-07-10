@@ -133,7 +133,7 @@ function initTreeApp(elementContainerId){
 }
 
 // POC: trajectories
-function addTrajectorySegment(object, startPoint, endPoint){
+function addTrajectorySegment_1(object, startPoint, endPoint){
 
     if(!object.trajectory){
         object.trajectory = new THREE.Group();
@@ -146,6 +146,28 @@ function addTrajectorySegment(object, startPoint, endPoint){
     var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
     object.trajectory.add(trajectoryLine);
     // scene.add(trajectoryLine);
+}
+
+// POC: trajectories
+function addTrajectorySegment(object, startPoint, endPoint){
+
+    newGeometry = new THREE.Geometry();
+    if(!!object.trajectory)
+        newGeometry.vertices.push(object.trajectory.vertices);
+    object.trajectory = newGeometry;
+
+
+    // var lineGeometry = object.trajectory;
+    // object.trajectory.vertices.push(startPoint);
+    object.trajectory.vertices.push(endPoint);
+    var trajectoryLine = new THREE.Line(object.trajectory, trajectoriesMaterial);
+
+    if(!!object.trajectoryLine){
+        scene.remove(object.trajectoryLine);
+    }
+
+    object.trajectoryLine = trajectoryLine;
+    scene.add(object.trajectoryLine);
 }
 
 // This function is basically the job of the game loop
