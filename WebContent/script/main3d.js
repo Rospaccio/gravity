@@ -133,7 +133,7 @@ function initTreeApp(elementContainerId){
 }
 
 // POC: trajectories
-function addTrajectorySegment(object, startPoint, endPoint){
+function addTrajectorySegment1(object, startPoint, endPoint){
 
     if(!object.trajectory){
         object.trajectory = new THREE.Group();
@@ -143,6 +143,37 @@ function addTrajectorySegment(object, startPoint, endPoint){
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices.push(startPoint);
     lineGeometry.vertices.push(endPoint);
+    var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
+    object.trajectory.add(trajectoryLine);
+    // scene.add(trajectoryLine);
+}
+
+function addTrajectorySegment(object, startPoint, endPoint){
+
+    if(!object.trajectory){
+        object.trajectory = new THREE.Group();
+        scene.add(object.trajectory);
+    }
+
+    var lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.vertices.push(startPoint);
+    lineGeometry.vertices.push(endPoint);
+    var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
+    object.trajectory.add(trajectoryLine);
+    // scene.add(trajectoryLine);
+}
+
+function addTrajectorySegment2(object, startPoint, endPoint){
+
+    if(!object.trajectoryGeometry){
+        object.trajectoryGeometry = new THREE.Geometry();
+        scene.add(object.trajectory);
+    }
+
+    var lineGeometry = new THREE.Geometry();
+    lineGeometry.vertices.push(startPoint);
+    lineGeometry.vertices.push(endPoint);
+    lineGeometry = new THREE.BufferGeometry().fromGeometry(lineGeometry);
     var trajectoryLine = new THREE.Line(lineGeometry, trajectoriesMaterial);
     object.trajectory.add(trajectoryLine);
     // scene.add(trajectoryLine);
