@@ -72,7 +72,7 @@ function addSimpleTestBodies(scene){
 }
 
 function addSpiralOfBodies(scene){
-    var additionalBodiesCount = 3;
+    var additionalBodiesCount = 64;
     var alpha = Math.PI / 12;
     var changingColor = new THREE.Color(0x337722);
     for (var i = 0; i < additionalBodiesCount; i++){

@@ -151,23 +151,19 @@ function addTrajectorySegment_1(object, startPoint, endPoint){
 // POC: trajectories
 function addTrajectorySegment(object, startPoint, endPoint){
 
-    newGeometry = new THREE.Geometry();
-    if(!!object.trajectory)
-        newGeometry.vertices.push(object.trajectory.vertices);
-    object.trajectory = newGeometry;
-
-
-    // var lineGeometry = object.trajectory;
-    // object.trajectory.vertices.push(startPoint);
-    object.trajectory.vertices.push(endPoint);
-    var trajectoryLine = new THREE.Line(object.trajectory, trajectoriesMaterial);
-
-    if(!!object.trajectoryLine){
-        scene.remove(object.trajectoryLine);
+    if(!!object.trajectory){
+        scene.remove(object.trajectory)
+    }
+    if(!object.trajectoryVertices){
+        object.trajectoryVertices = [];
     }
 
-    object.trajectoryLine = trajectoryLine;
-    scene.add(object.trajectoryLine);
+    object.trajectoryVertices.push(endPoint);
+    var trajectoryGeometry = new THREE.Geometry();
+    trajectoryGeometry.vertices = object.trajectoryVertices;
+    var trajectory = new THREE.Line(trajectoryGeometry, trajectoriesMaterial);
+    object.trajectory = trajectory;
+    scene.add(trajectory);
 }
 
 // This function is basically the job of the game loop
