@@ -96,14 +96,18 @@ Experiment.setupScene_02 = function (){
 
     oldSpiral = null;
     spiralPoints = [];
+    rumor = 0;
 
     function updateObjects(){
 
+        var sign = Math.random() < .5 ? -1 : 1;
+        rumor = sign * .1 * Math.random();
+
         var a = .1;
         var t = clock.getElapsedTime();
-        var x = a * t * Math.cos(t);
-        var y = a * t * Math.sin(t);
-        var z = 0.1 * t;
+        var x = a * t * Math.cos(t) + rumor;
+        var y = a * t * Math.sin(t) + rumor;
+        var z = 0.1 * t + rumor;
         var newSpiralPoint = new THREE.Vector3(x, y, z);
         spiralPoints.push(newSpiralPoint);
 
