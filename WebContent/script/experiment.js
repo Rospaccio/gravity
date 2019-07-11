@@ -30,7 +30,7 @@ Experiment.setupScene_01 = function (){
 
 Experiment.addDefaultLights = function(scene){
     //Ligths
-    var ambientLight = new THREE.AmbientLight(0x404040);
+    var ambientLight = new THREE.AmbientLight(0xFFFFFF);
     scene.add(ambientLight);
 
     var light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
@@ -44,9 +44,23 @@ Experiment.addDefaultLights = function(scene){
     //Lights end
 }
 
+Experiment.addTrackballControls = function(camera){
+    var trackBallControls = new THREE.TrackballControls(camera);
+    trackBallControls.rotateSpeed = 1.0;
+    trackBallControls.zoomSpeed = 1.2;
+    trackBallControls.panSpeed = 0.8;
+    trackBallControls.noZoom = false;
+    trackBallControls.noPan = false;
+    trackBallControls.staticMoving = true;
+    trackBallControls.dynamicDampingFactor = 0.3;
+
+    return trackBallControls;
+}
+
 Experiment.setupScene_02 = function (){
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 1000 );
+    clock = new THREE.Clock();
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -54,25 +68,54 @@ Experiment.setupScene_02 = function (){
     container.appendChild( renderer.domElement );
 
     Experiment.addDefaultLights(scene);
+    controls = Experiment.addTrackballControls(camera);
 
-    var geometry = new THREE.Geometry();
+    geometry = new THREE.Geometry();
 
-    geometry.vertices.push(0, 0, 0);
-    geometry.vertices.push(1, 0, 0);
-    geometry.vertices.push(1, 10, 0);
-    geometry.vertices.push(10, 2, 2);
+    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    geometry.vertices.push(new THREE.Vector3(1, 0, 0));
+    geometry.vertices.push(new THREE.Vector3(1, 1, 0));
+    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
 
-    var material = new THREE.LineBasicMaterial( { color: 0x778877 } );
+    material = new THREE.LineBasicMaterial( { color: 0x88ff88 } );
     var line = new THREE.Line( geometry, material );
     scene.add( line );
 
-    camera.position.z = 5;
+    camera.position.z = 5
 
     var animate = function () {
+
+        controls.update(.02);
+
+        updateObjects();
+
         requestAnimationFrame( animate );
 
         renderer.render( scene, camera );
     };
+
+    oldSpiral = null;
+    spiralPoints = [];
+
+    function updateObjects(){
+
+        var a = .1;
+        var t = clock.getElapsedTime();
+        var x = a * t * Math.cos(t);
+        var y = a * t * Math.sin(t);
+        var z = 0.1 * t;
+        var newSpiralPoint = new THREE.Vector3(x, y, z);
+        spiralPoints.push(newSpiralPoint);
+
+        var spiralGeometry = new THREE.Geometry();
+        spiralGeometry.vertices = spiralPoints;
+        var line = new THREE.Line( spiralGeometry, material );
+        if(oldSpiral !== null){
+            scene.remove(oldSpiral);
+        }
+        scene.add(line);
+        oldSpiral = line;
+    }
 
     animate();
 }
