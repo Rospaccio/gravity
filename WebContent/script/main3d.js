@@ -32,6 +32,7 @@ var addMode = false;
 
 var scene;
 var trajectoriesMaterial;
+var trajClick = 0;
 
 function threeApp(elementContainerId)
 {
@@ -39,15 +40,15 @@ function threeApp(elementContainerId)
     animate();
 }
 
-function start(){
+function start() {
     simulationRunning = true;
 }
 
-function pause(){
+function pause() {
     simulationRunning = false;
 }
 
-function initTreeApp(elementContainerId){
+function initTreeApp(elementContainerId) {
     scene = new THREE.Scene();
 
 //	var height = width / ( window.innerWidth / window.innerHeight);
@@ -83,12 +84,13 @@ function initTreeApp(elementContainerId){
 
     addOriginMassiveBody(scene);
     //addSimpleTestBodies(scene);
-    addSpiralOfBodies(scene)
-    
-    //drawAxes(scene);
-    drawGalaxyBackground(scene);
+    //addSpiralOfBodies(scene)
+    addPlanetAndSatellite(scene);
+
+    drawAxes(scene);
+    // drawGalaxyBackground(scene);
     planes = drawHelperPlane(scene);
-    
+
     camera.position.x = -30;
     camera.position.y = 30;
     camera.position.z = 80;
@@ -112,14 +114,13 @@ function initTreeApp(elementContainerId){
     flyControls.rollSpeed = Math.PI / 12;
     flyControls.autoForward = false;
     flyControls.dragToLook = true;
-    
+
     allAvailableControls["trackball"] = trackBallControls;
     allAvailableControls["fly"] = flyControls;
-    
-    if(Constants.CONTROLS_TYPE === "trackball"){
+
+    if (Constants.CONTROLS_TYPE === "trackball") {
         currentControls = trackBallControls;
-    }
-    else if(Constants.CONTROLS_TYPE === "fly"){
+    } else if (Constants.CONTROLS_TYPE === "fly") {
         currentControls = flyControls;
     }
     // Use of the Raycaster inspired by  webgl_interactive_cubes.html, in the THREE.js project examples directory
@@ -129,13 +130,13 @@ function initTreeApp(elementContainerId){
     window.addEventListener('resize', onWindowResize, false);
     document.addEventListener('mousedown', onMouseDown, false);
 
-    trajectoriesMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
+    trajectoriesMaterial = new THREE.LineBasicMaterial({color: 0xffffff});
 }
 
 // POC: trajectories
-function addTrajectorySegment_1(object, startPoint, endPoint){
+function addTrajectorySegment_1(object, startPoint, endPoint) {
 
-    if(!object.trajectory){
+    if (!object.trajectory) {
         object.trajectory = new THREE.Group();
         scene.add(object.trajectory);
     }
@@ -149,18 +150,22 @@ function addTrajectorySegment_1(object, startPoint, endPoint){
 }
 
 // POC: trajectories
-function addTrajectorySegment(object, startPoint, endPoint){
+function addTrajectorySegment(object, startPoint, endPoint) {
 
-    if(!!object.trajectory){
+    if (!!object.trajectory) {
         scene.remove(object.trajectory)
     }
-    if(!object.trajectoryVertices){
+    if (!object.trajectoryVertices) {
         object.trajectoryVertices = [];
     }
 
-    object.trajectoryVertices.push(endPoint);
-    var trajectoryGeometry = new THREE.Geometry();
-    trajectoryGeometry.vertices = object.trajectoryVertices;
+    object.trajectoryVertices.push(endPoint.x);
+    object.trajectoryVertices.push(endPoint.y);
+    object.trajectoryVertices.push(endPoint.z);
+
+    var floats = new Float32Array(object.trajectoryVertices);
+    var trajectoryGeometry = new THREE.BufferGeometry();
+    trajectoryGeometry.addAttribute('position', new THREE.BufferAttribute(floats, 3));
     var trajectory = new THREE.Line(trajectoryGeometry, trajectoriesMaterial);
     object.trajectory = trajectory;
     scene.add(trajectory);
@@ -173,20 +178,20 @@ function animate()
     var delta = clock.getDelta();
     elapsedTime += delta;
     requestAnimationFrame(animate);
-    if(simulationRunning){
+    if (simulationRunning) {
         updateObjects(delta);
     }
     render();
 }
 
-function updateObjects(delta){
-       var nextArray = [];
+function updateObjects(delta) {
+    trajClick++;
+    var nextArray = [];
     var bodiesCount = celestialBodies.length;
     for (var i = 0; i < bodiesCount; i++) {
         if (celestialBodies[i].markedForRemoval) {
             scene.remove(celestialBodies[i].mesh);
-        }
-        else {
+        } else {
             nextArray.push(celestialBodies[i]);
         }
     }
@@ -216,7 +221,8 @@ function updateObjects(delta){
         var previousPosition = celestialBodies[i].getPosition().clone();
         celestialBodies[i].updatePosition();
         var newPosition = celestialBodies[i].getPosition().clone();
-        addTrajectorySegment(celestialBodies[i], previousPosition, newPosition);
+        if (trajClick % 2 === 0)
+            addTrajectorySegment(celestialBodies[i], previousPosition, newPosition);
 
         // check if the body is gone too far: if so, marks it for removal
         if (celestialBodies[i].getPosition().distanceTo(new THREE.Vector3(0, 0, 0)) > Constants.REMOVAL_DISTANCE_THRESHOLD) {
@@ -234,19 +240,19 @@ function updateObjects(delta){
     }
 }
 
-function render(){
+function render() {
     currentControls.update(Constants.DEFAULT_TIME_DELTA);
-        
+
     manageRaycasterIntersections(scene, camera);
     renderer.render(scene, camera);
 }
 
-function resolveCollision(firstBody, secondBody){
+function resolveCollision(firstBody, secondBody) {
     // preconditions: checks if the bodies are relly colliding
-    if(!firstBody.overlaps(secondBody)){
+    if (!firstBody.overlaps(secondBody)) {
         return;
     }
-    if (firstBody.markedForRemoval || secondBody.markedForRemoval){
+    if (firstBody.markedForRemoval || secondBody.markedForRemoval) {
         return;
     }
     // both bodies (and both meshes) will be removed, a new one, resulting from the sum
@@ -256,44 +262,43 @@ function resolveCollision(firstBody, secondBody){
     // the most massive body retains its properties (color, radius, etc...)
     var prototypeBody;
     var disappearingBody;
-    if(firstBody.mass >= secondBody.mass){
+    if (firstBody.mass >= secondBody.mass) {
         prototypeBody = firstBody;
         disappearingBody = secondBody;
-    }
-    else{
+    } else {
         prototypeBody = secondBody;
         disappearingBody = firstBody;
     }
-    
+
     var maxRadius = Math.max(firstBody.getRadius(), secondBody.getRadius());
     var unionGeometry = new THREE.SphereGeometry(maxRadius, 32, 32);
     var material = prototypeBody.mesh.material; // new THREE.MeshLambertMaterial({color: 0xFF0000});
     var unionMesh = new THREE.Mesh(unionGeometry, material);
-    
+
     var position = prototypeBody.getPosition().clone();
-    
+
     unionMesh.position.x = position.x;
     unionMesh.position.y = position.y;
     unionMesh.position.z = position.z;
-    
+
     // TODO: compute the correct velocity
-    
+
     // m[vx, vy, vz]+mv2[vx2, vy2, vz2]=M[Vx, Vy, Vz]
     // [Vx, Vy, Vz] = m1v1 + m2v2 / M
     var sumMass = firstBody.mass + secondBody.mass;
-    var velocity = (firstBody.velocity.clone().multiplyScalar(firstBody.mass).add( secondBody.velocity.clone().multiplyScalar(secondBody.mass) ))
+    var velocity = (firstBody.velocity.clone().multiplyScalar(firstBody.mass).add(secondBody.velocity.clone().multiplyScalar(secondBody.mass)))
     velocity.divideScalar(sumMass);
-    
+
     var unionBody = new CelestialBody(sumMass, velocity, unionMesh);
-    
+
     newCelestialBodies.push(unionBody);
 }
 
-function customLog(message){
-	if(Constants.LOG_ENABLED){
-		console.log(message);
-	}
-} 
+function customLog(message) {
+    if (Constants.LOG_ENABLED) {
+        console.log(message);
+    }
+}
 
 function onDocumentMouseMove(event) {
     event.preventDefault();
@@ -314,28 +319,28 @@ function manageRaycasterIntersections(scene, camera) {
     var intersects = raycaster.intersectObjects(scene.children);
 }
 
-function onMouseDown(event){
-    if(event.ctrlKey || addMode){
+function onMouseDown(event) {
+    if (event.ctrlKey || addMode) {
         //customLog("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
         /*
-            distance – distance between the origin of the ray and the intersection
-            point – point of intersection, in world coordinates
-            face – intersected face
-            faceIndex – index of the intersected face
-            indices – indices of vertices comprising the intersected face
-            object – the intersected object
+         distance – distance between the origin of the ray and the intersection
+         point – point of intersection, in world coordinates
+         face – intersected face
+         faceIndex – index of the intersected face
+         indices – indices of vertices comprising the intersected face
+         object – the intersected object
          */
         var intersections = raycaster.intersectObjects(planes, false);
-        if(intersections.length > 0){
+        if (intersections.length > 0) {
             planeIntersection = intersections[0];
-            
+
             var cameraPosition = camera.position.clone();
             var intersectionPoint = planeIntersection.point.clone();
-            
+
             var velocityVersor = intersectionPoint.sub(cameraPosition).normalize();
             var velocityMagnitude = 20;
             var velocity = velocityVersor.multiplyScalar(velocityMagnitude);
-            
+
             addDefaultCelestialBody(velocity, planeIntersection.point, scene);
 //            addCelestialBody(1, 32, 0x00FF00, Constants.MOON_MASS * 10, velocity, planeIntersection.point, scene);
         }
@@ -361,12 +366,12 @@ function onKeyDown(event) {
     var keyCode = event.keyCode;
 }
 
-function onKeyUp(event){
-    
+function onKeyUp(event) {
+
 }
 
-function toggleHelperPlanesVisibility(){
-    for(var i = 0; i < planes.length; i++){
+function toggleHelperPlanesVisibility() {
+    for (var i = 0; i < planes.length; i++) {
         planes[i].visible = !planes[i].visible;
     }
 }

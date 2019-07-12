@@ -101,18 +101,22 @@ Experiment.setupScene_02 = function (){
     function updateObjects(){
 
         var sign = Math.random() < .5 ? -1 : 1;
-        rumor = sign * .1 * Math.random();
+        var noise = 0; // sign * .05 * Math.random();
 
         var a = .1;
         var t = clock.getElapsedTime();
-        var x = a * t * Math.cos(t) + rumor;
-        var y = a * t * Math.sin(t) + rumor;
-        var z = 0.1 * t + rumor;
-        var newSpiralPoint = new THREE.Vector3(x, y, z);
-        spiralPoints.push(newSpiralPoint);
+        var x = a * t * Math.cos(t) + noise;
+        var y = a * t * Math.sin(t) + noise;
+        var z = 0.1 * t + noise;
+        // var newSpiralPoint = new THREE.Vector3(x, y, z);
+        spiralPoints.push(x);
+        spiralPoints.push(y);
+        spiralPoints.push(z);
 
-        var spiralGeometry = new THREE.Geometry();
-        spiralGeometry.vertices = spiralPoints;
+        var spiralGeometry = new THREE.BufferGeometry();
+        
+        var vertices = new Float32Array(spiralPoints);
+        spiralGeometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
         var line = new THREE.Line( spiralGeometry, material );
         if(oldSpiral !== null){
             scene.remove(oldSpiral);

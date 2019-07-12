@@ -40,7 +40,7 @@ function addOriginMassiveBody(scene){
     var planetGeometry = new THREE.SphereGeometry( 2, 32, 32);
     var material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
     var planetSphere = new THREE.Mesh( planetGeometry, material );
-    var planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 0, 0), planetSphere);
+    var planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, -5, 0), planetSphere);
     scene.add( planetSphere );
     celestialBodies.push(planet);
 }
@@ -100,6 +100,29 @@ function addSpiralOfBodies(scene){
         scene.add(additionalMoonSphere);
         celestialBodies.push(additionalMoon);
     }
+}
+
+function addPlanetAndSatellite(scene){
+    
+    var geometry = new THREE.SphereGeometry(1, 32, 32);
+    var material = new THREE.MeshLambertMaterial({color: 0x221199});
+    var sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 100;
+    sphere.position.y = 0;
+    sphere.position.z = 0;
+    var planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 5, 0), sphere);
+    scene.add(sphere);
+    celestialBodies.push(planet);
+    
+    geometry = new THREE.SphereGeometry(1, 32, 32);
+    material = new THREE.MeshLambertMaterial({color: 0xFF0000});
+    sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 130;
+    sphere.position.y = 0;
+    sphere.position.z = 0;
+    var satellite = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 5), sphere);
+    scene.add(sphere);
+    celestialBodies.push(satellite);
 }
 
 function drawHelperPlane(scene) {

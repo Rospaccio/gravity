@@ -29,6 +29,8 @@ function CelestialBody(mass, velocity, mesh){
 	};
 	
         this.getRadius = function(){
+            if(mesh.geometry.boundingSphere === null)
+                mesh.geometry.computeBoundingSphere();
             return mesh.geometry.boundingSphere.radius;
         };
         
