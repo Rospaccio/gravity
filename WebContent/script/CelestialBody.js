@@ -97,8 +97,8 @@ function CelestialBody(mass, velocity, mesh){
 		var nextPosition = this.getPosition().clone();
 		var tempAcceleration = this.acceleration.clone();
 		var tempVelocity = this.velocity.clone();
-		nextPosition.add( tempAcceleration.multiplyScalar(delta * delta).multiplyScalar(.5) );
-		nextPosition.add( tempVelocity.multiplyScalar(delta));
+		// nextPosition.add( tempAcceleration.multiplyScalar(delta * delta).multiplyScalar(.5) );
+		nextPosition.add( tempVelocity.multiplyScalar(delta) );
 		/* */
 
 

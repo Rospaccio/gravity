@@ -85,13 +85,13 @@ function addSpiralOfBodies(scene){
         
         var x  = distance * Math.cos(alpha * i);
         var y = distance * Math.sin(i + alpha * i * 6);
-        var z = distance * Math.sin(alpha * i);
+        var z = 0; // distance * Math.sin(alpha * i);
         
-        var vConst = 7;
+        var vConst = 10 ;
         var vx = -1 * (vConst) * Math.sin(alpha * i);
         var vz = (vConst) * Math.cos(alpha * i);
         
-        var additionalMoon = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(vx, 0, vz), additionalMoonSphere);
+        var additionalMoon = new CelestialBody(Constants.MOON_MASS * (64/(i+1)), new THREE.Vector3(vx, 0, vz), additionalMoonSphere);
         
         additionalMoonSphere.position.x = x;
         additionalMoonSphere.position.y = y;
@@ -107,7 +107,7 @@ function addPlanetAndSatellite(scene){
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshLambertMaterial({color: 0x221199});
     var sphere = new THREE.Mesh(geometry, material);
-    sphere.position.x = 100;
+    sphere.position.x = 140;
     sphere.position.y = 0;
     sphere.position.z = 0;
     var planet = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, 5, 0), sphere);
@@ -117,10 +117,10 @@ function addPlanetAndSatellite(scene){
     geometry = new THREE.SphereGeometry(1, 32, 32);
     material = new THREE.MeshLambertMaterial({color: 0xFF0000});
     sphere = new THREE.Mesh(geometry, material);
-    sphere.position.x = 130;
+    sphere.position.x = 160;
     sphere.position.y = 0;
     sphere.position.z = 0;
-    var satellite = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 5), sphere);
+    var satellite = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 15), sphere);
     scene.add(sphere);
     celestialBodies.push(satellite);
 }

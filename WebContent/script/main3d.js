@@ -83,11 +83,11 @@ function initTreeApp(elementContainerId) {
     document.getElementById(elementContainerId).appendChild(renderer.domElement);
 
     addOriginMassiveBody(scene);
-    //addSimpleTestBodies(scene);
-    //addSpiralOfBodies(scene)
+    // addSimpleTestBodies(scene);
+    // addSpiralOfBodies(scene)
     addPlanetAndSatellite(scene);
 
-    drawAxes(scene);
+    // drawAxes(scene);
     // drawGalaxyBackground(scene);
     planes = drawHelperPlane(scene);
 
@@ -165,8 +165,9 @@ function addTrajectorySegment(object, startPoint, endPoint) {
 
     var floats = new Float32Array(object.trajectoryVertices);
     var trajectoryGeometry = new THREE.BufferGeometry();
+    var material = new THREE.LineBasicMaterial({color: object.mesh.material.color});
     trajectoryGeometry.addAttribute('position', new THREE.BufferAttribute(floats, 3));
-    var trajectory = new THREE.Line(trajectoryGeometry, trajectoriesMaterial);
+    var trajectory = new THREE.Line(trajectoryGeometry, material);
     object.trajectory = trajectory;
     scene.add(trajectory);
 }
@@ -191,6 +192,7 @@ function updateObjects(delta) {
     for (var i = 0; i < bodiesCount; i++) {
         if (celestialBodies[i].markedForRemoval) {
             scene.remove(celestialBodies[i].mesh);
+            scene.remove(celestialBodies[i].trajectory);
         } else {
             nextArray.push(celestialBodies[i]);
         }
@@ -373,5 +375,14 @@ function onKeyUp(event) {
 function toggleHelperPlanesVisibility() {
     for (var i = 0; i < planes.length; i++) {
         planes[i].visible = !planes[i].visible;
+    }
+}
+
+function clearTraces(){
+    
+    var size = celestialBodies.length;
+    for(var i = 0; i < size; i++){
+        
+        celestialBodies[i].trajectoryVertices = [];
     }
 }
