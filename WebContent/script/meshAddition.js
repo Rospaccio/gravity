@@ -164,7 +164,7 @@ function drawHelperPlane(scene) {
     scene.add(plane);
     scene.add(upsideDownPlane);
 
-    var gridGroup = drawHelperGrid(scene);
+    drawHelperGrid(scene);
 
     return [plane, upsideDownPlane];
 }
@@ -173,8 +173,6 @@ function drawHelperGrid(scene){
     var minBound = -400;
     var maxBound = 400;
     var currentBound = minBound;
-
-    var gridGroup = new THREE.Group();
 
     while(currentBound <= maxBound){
 
@@ -195,12 +193,8 @@ function drawHelperGrid(scene){
 
         scene.add(line);
 
-        gridGroup.add(line);
-
         currentBound += 10;
     }
-
-    return gridGroup;
 }
 
 function drawGalaxyBackground(scene)
