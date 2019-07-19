@@ -123,6 +123,26 @@ function addPlanetAndSatellite(scene){
     var satellite = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 15), sphere);
     scene.add(sphere);
     celestialBodies.push(satellite);
+
+    geometry = new THREE.SphereGeometry(1, 32, 32);
+    material = new THREE.MeshLambertMaterial({color: 0x11AABB});
+    sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 15;
+    sphere.position.y = 0;
+    sphere.position.z = 0;
+    var satellite = new CelestialBody(Constants.MOON_MASS, new THREE.Vector3(0, 0, 20), sphere);
+    scene.add(sphere);
+    celestialBodies.push(satellite);
+
+    geometry = new THREE.SphereGeometry(1, 32, 32);
+    material = new THREE.MeshLambertMaterial({color: 0x32F034});
+    sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 190;
+    sphere.position.y = 0;
+    sphere.position.z = 0;
+    var satellite = new CelestialBody(Constants.EARTH_MASS, new THREE.Vector3(0, -5, 0), sphere);
+    scene.add(sphere);
+    celestialBodies.push(satellite);
 }
 
 function drawHelperPlane(scene) {
@@ -132,19 +152,55 @@ function drawHelperPlane(scene) {
     // the plane is equal to the y-z axes plane: need to be rotated 90 degrees
     // in order to match with the x-z plane. Thus we obtain a plane that face the up direction
     geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
-    var plane = new THREE.Mesh(geometry);
-    plane.visible = false;
+    var material = new THREE.MeshPhongMaterial({color: 0xDDDDDD, opacity: 0.0, transparent: true});
+    var plane = new THREE.Mesh(geometry, material);
     
     var upsideDownPlaneGeometry = geometry.clone();
     // Similar to the previuos case, except that now we must rotate 180 degrees because
     // we need a plane that face the down direction
     upsideDownPlaneGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI));
-    var upsideDownPlane = new THREE.Mesh(upsideDownPlaneGeometry);
-    upsideDownPlane.visible = false;
+    var upsideDownPlane = new THREE.Mesh(upsideDownPlaneGeometry, material);
     
     scene.add(plane);
     scene.add(upsideDownPlane);
+
+    var gridGroup = drawHelperGrid(scene);
+
     return [plane, upsideDownPlane];
+}
+
+function drawHelperGrid(scene){
+    var minBound = -400;
+    var maxBound = 400;
+    var currentBound = minBound;
+
+    var gridGroup = new THREE.Group();
+
+    while(currentBound <= maxBound){
+
+        var gridLineMaterial = new THREE.LineBasicMaterial({color: 0xffffff});
+        var vertexA = new THREE.Vector3(currentBound, 0, minBound);
+        var vertexB = new THREE.Vector3(currentBound, 0, maxBound);
+        var gridLineGeometry = new THREE.Geometry();
+        gridLineGeometry.vertices.push(vertexA, vertexB);
+        var line = new THREE.Line(gridLineGeometry, gridLineMaterial);
+
+        scene.add(line);
+
+        vertexA = new THREE.Vector3(minBound, 0, currentBound);
+        vertexB = new THREE.Vector3(maxBound, 0, currentBound);
+        gridLineGeometry = new THREE.Geometry();
+        gridLineGeometry.vertices.push(vertexA, vertexB);
+        line = new THREE.Line(gridLineGeometry, gridLineMaterial);
+
+        scene.add(line);
+
+        gridGroup.add(line);
+
+        currentBound += 10;
+    }
+
+    return gridGroup;
 }
 
 function drawGalaxyBackground(scene)

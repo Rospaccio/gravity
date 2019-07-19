@@ -340,7 +340,7 @@ function onMouseDown(event) {
             var intersectionPoint = planeIntersection.point.clone();
 
             var velocityVersor = intersectionPoint.sub(cameraPosition).normalize();
-            var velocityMagnitude = 20;
+            var velocityMagnitude = 10;
             var velocity = velocityVersor.multiplyScalar(velocityMagnitude);
 
             addDefaultCelestialBody(velocity, planeIntersection.point, scene);
@@ -372,10 +372,18 @@ function onKeyUp(event) {
 
 }
 
+var planesVisible = false;
 function toggleHelperPlanesVisibility() {
     for (var i = 0; i < planes.length; i++) {
-        planes[i].visible = !planes[i].visible;
+        if(planesVisible){
+            planes[i].material.opacity = 0.0;
+        }
+        else{
+            planes[i].material.opacity = 0.7;
+        }
+        planes[i].material.needsUpdate = true;
     }
+    planesVisible = !planesVisible;
 }
 
 function clearTraces(){
