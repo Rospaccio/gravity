@@ -164,8 +164,6 @@ function drawHelperPlane(scene) {
     scene.add(plane);
     scene.add(upsideDownPlane);
 
-    drawHelperGrid(scene);
-
     return [plane, upsideDownPlane];
 }
 
@@ -174,15 +172,17 @@ function drawHelperGrid(scene){
     var maxBound = 400;
     var currentBound = minBound;
 
+    var gridLines = [];
     while(currentBound <= maxBound){
 
-        var gridLineMaterial = new THREE.LineBasicMaterial({color: 0xffffff});
+        var gridLineMaterial = new THREE.LineBasicMaterial({color: 0xeaecf0, transparent: true, opacity: 0.5});
         var vertexA = new THREE.Vector3(currentBound, 0, minBound);
         var vertexB = new THREE.Vector3(currentBound, 0, maxBound);
         var gridLineGeometry = new THREE.Geometry();
         gridLineGeometry.vertices.push(vertexA, vertexB);
         var line = new THREE.Line(gridLineGeometry, gridLineMaterial);
 
+        gridLines.push(line);
         scene.add(line);
 
         vertexA = new THREE.Vector3(minBound, 0, currentBound);
@@ -191,10 +191,13 @@ function drawHelperGrid(scene){
         gridLineGeometry.vertices.push(vertexA, vertexB);
         line = new THREE.Line(gridLineGeometry, gridLineMaterial);
 
+        gridLines.push(line);
         scene.add(line);
 
         currentBound += 10;
     }
+
+    return gridLines;
 }
 
 function drawGalaxyBackground(scene)

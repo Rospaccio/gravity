@@ -64,8 +64,8 @@ function initTreeApp(elementContainerId) {
 
     renderer.setClearColor(0x202020, 1.0);
 
-//    scene.fog = new THREE.Fog( 0x111111, 4, 2500 );
-    //Ligths
+    // scene.fog = new THREE.Fog( 0x111111, 4, 2500 );
+    // Lights
     var ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
 
@@ -77,7 +77,7 @@ function initTreeApp(elementContainerId) {
 
     scene.add(light);
     scene.add(light2);
-    //Lights end
+    // Lights end
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById(elementContainerId).appendChild(renderer.domElement);
@@ -90,6 +90,7 @@ function initTreeApp(elementContainerId) {
     // drawAxes(scene);
     // drawGalaxyBackground(scene);
     planes = drawHelperPlane(scene);
+    grid = drawHelperGrid(scene);
 
     camera.position.x = -30;
     camera.position.y = 30;
@@ -283,7 +284,7 @@ function resolveCollision(firstBody, secondBody) {
     unionMesh.position.y = position.y;
     unionMesh.position.z = position.z;
 
-    // TODO: compute the correct velocity
+    // TODO: review the calculation of the velocity 
 
     // m[vx, vy, vz]+mv2[vx2, vy2, vz2]=M[Vx, Vy, Vz]
     // [Vx, Vy, Vz] = m1v1 + m2v2 / M
@@ -323,7 +324,7 @@ function manageRaycasterIntersections(scene, camera) {
 
 function onMouseDown(event) {
     if (event.ctrlKey || addMode) {
-        //customLog("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
+        // customLog("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
         /*
          distance – distance between the origin of the ray and the intersection
          point – point of intersection, in world coordinates
@@ -384,6 +385,20 @@ function toggleHelperPlanesVisibility() {
         planes[i].material.needsUpdate = true;
     }
     planesVisible = !planesVisible;
+}
+
+var gridVisible = true;
+function toggleGridVisibility(){
+    gridVisible = !gridVisible;
+    if(!gridVisible){
+
+        for(i = 0; i < grid.length; i++){
+            var line = grid[i];
+            scene.remove(line);
+        }        
+        return;
+    }
+    grid = drawHelperGrid(scene);
 }
 
 function clearTraces(){
